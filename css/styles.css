@@ -19,23 +19,30 @@
   --scroll-depth: 0px;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   scroll-behavior: smooth;
 }
 
 body {
   position: relative;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--white);
   background: var(--bg-deep);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body::before,
@@ -250,7 +257,7 @@ input {
   min-height: calc(100vh - 76px);
   grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.9fr);
   gap: clamp(28px, 5vw, 70px);
-  padding: clamp(64px, 9vh, 108px) max(16px, calc((100vw - 1180px) / 2)) 56px;
+  padding: clamp(64px, 9vh, 108px) max(16px, calc((100% - 1180px) / 2)) 56px;
   overflow: hidden;
   isolation: isolate;
 }
@@ -634,10 +641,9 @@ h3 {
 .section::after {
   content: "";
   position: absolute;
-  left: 50%;
-  width: 100vw;
+  inset-inline: 0;
+  width: 100%;
   pointer-events: none;
-  transform: translateX(-50%);
 }
 
 .section::before {
@@ -893,8 +899,13 @@ h3 {
 .product-grid {
   position: relative;
   display: grid;
+  max-width: 100%;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.products {
+  overflow: hidden;
 }
 
 .products::before {
@@ -1061,7 +1072,7 @@ h3 {
   position: relative;
   width: 100%;
   margin: 0;
-  padding: 76px max(16px, calc((100vw - 1180px) / 2)) 104px;
+  padding: 76px max(16px, calc((100% - 1180px) / 2)) 104px;
   border-top: 1px solid rgba(105, 180, 255, 0.3);
   display: flex;
   justify-content: space-between;
@@ -1119,8 +1130,8 @@ h3 {
 .whatsapp-float,
 .chatbot-toggle {
   position: fixed;
-  right: 22px;
-  z-index: 60;
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 1000;
   width: 58px;
   height: 58px;
   border-radius: 50%;
@@ -1132,7 +1143,7 @@ h3 {
 }
 
 .whatsapp-float {
-  bottom: 22px;
+  bottom: max(16px, env(safe-area-inset-bottom));
   background: #25d366;
   box-shadow: 0 14px 34px rgba(37, 211, 102, 0.32);
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
@@ -1151,7 +1162,7 @@ h3 {
 }
 
 .chatbot-toggle {
-  bottom: 92px;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 74px);
   overflow: visible;
   color: white;
   background:
@@ -1260,10 +1271,11 @@ h3 {
 
 .chatbot-panel {
   position: fixed;
-  right: 22px;
-  bottom: 162px;
-  z-index: 70;
-  width: min(390px, calc(100vw - 32px));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 144px);
+  z-index: 1001;
+  width: min(390px, calc(100% - 32px));
+  max-width: 380px;
   height: min(560px, calc(100vh - 190px));
   min-height: 430px;
   display: flex;
@@ -1623,8 +1635,8 @@ h3 {
 
   .hero-cinematic .hero-content,
   .hero-carousel {
-    width: min(100%, calc(100vw - 24px));
-    max-width: calc(100vw - 24px);
+    width: 100%;
+    max-width: 100%;
   }
 
   .hero-cinematic .hero-content {
@@ -1656,6 +1668,9 @@ h3 {
   }
 
   .hero-card-track {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
     grid-auto-columns: min(260px, 78vw);
   }
 
@@ -1669,15 +1684,12 @@ h3 {
   }
 
   .chatbot-panel {
-    right: 12px;
-    bottom: 148px;
-    width: calc(100vw - 24px);
-    height: min(540px, calc(100vh - 165px));
-  }
-
-  .whatsapp-float,
-  .chatbot-toggle {
+    left: 16px;
     right: 16px;
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 132px);
+    width: auto;
+    max-width: none;
+    height: min(540px, calc(100vh - 165px));
   }
 
   .whatsapp-float,
@@ -1687,7 +1699,7 @@ h3 {
   }
 
   .chatbot-toggle {
-    bottom: 88px;
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 70px);
   }
 
   .chatbot-tooltip {
