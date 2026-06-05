@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DCS Technology vende celulares, tablets, computadores y accesorios con financiacion, diagnostico tecnico local y asesor por WhatsApp.">
+  <meta name="keywords" content="DCS Technology, celulares, tablets, computadores, accesorios, financiacion, diagnostico tecnico, reparacion celular">
+  <meta name="author" content="DCS Technology">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="DCS Technology | Tecnologia, financiacion y diagnostico tecnico">
+  <meta property="og:description" content="Compra celulares, tablets, computadores y accesorios. Recibe diagnostico tecnico inicial por chatbot local y asesoria por WhatsApp.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/img/og-dcs-technology.svg">
+  <meta property="og:locale" content="es_CO">
+  <title>DCS Technology | Tecnologia, financiacion y diagnostico tecnico</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <header class="site-header" data-animate>
+    <nav class="nav" aria-label="Navegacion principal">
+      <a class="brand" href="#inicio" aria-label="Ir al inicio de DCS Technology">
+        <span class="brand-mark" aria-hidden="true">D</span>
+        <span>
+          <strong>DCS Technology</strong>
+          <small>Tech innovation</small>
+        </span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="mainMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-menu" id="mainMenu">
+        <a href="#productos">Productos</a>
+        <a href="#promociones">Promociones</a>
+        <a href="#financiacion">Financiacion</a>
+        <a href="#diagnostico">Diagnostico</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero hero-cinematic" id="inicio" aria-label="Servicios destacados de DCS Technology">
+      <div class="hero-background" aria-hidden="true">
+        <img id="heroBgCurrent" src="assets/img/hero-celulares.svg" alt="">
+        <img id="heroBgNext" src="assets/img/hero-celulares.svg" alt="">
+      </div>
+      <div class="hero-depth-layer" aria-hidden="true"></div>
+
+      <div class="hero-content" data-animate>
+        <p class="eyebrow" id="heroCategory">Celulares premium</p>
+        <h1 id="heroTitle">Tecnologia movil de alto nivel</h1>
+        <p class="hero-copy" id="heroSubtitle">Celulares modernos, potentes y listos para trabajo, estudio y entretenimiento.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#productos">Ver productos</a>
+          <a class="btn btn-secondary" href="https://wa.me/573178765432?text=Hola%2C%20quiero%20asesoria%20de%20DCS%20Technology" target="_blank" rel="noopener noreferrer">Cotizar por WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="hero-carousel" data-animate>
+        <div class="hero-carousel-head">
+          <span>Experiencias DCS</span>
+          <div class="hero-controls">
+            <button class="hero-control" id="heroPrev" type="button" aria-label="Ver slide anterior">&lt;</button>
+            <button class="hero-control" id="heroNext" type="button" aria-label="Ver slide siguiente">&gt;</button>
+          </div>
+        </div>
+        <div class="hero-card-track" id="heroCardTrack" aria-label="Carrusel de servicios tecnologicos" tabindex="0"></div>
+        <div class="hero-progress" aria-hidden="true">
+          <span id="heroProgressBar"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section categories" id="categorias" aria-labelledby="categoriasTitle">
+      <div class="section-heading" data-animate>
+        <p class="eyebrow">Catalogo</p>
+        <h2 id="categoriasTitle">Soluciones tecnologicas para cada necesidad</h2>
+      </div>
+      <div class="category-grid">
+        <article class="category-card" data-animate>
+          <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-celulares.svg" alt="Celulares premium en catalogo DCS Technology" loading="lazy" referrerpolicy="no-referrer">
+          <span aria-hidden="true">5G</span>
+          <h3>Celulares</h3>
+          <p>Gama media, alta y equipos recomendados por presupuesto.</p>
+        </article>
+        <article class="category-card" data-animate>
+          <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-computadores.svg" alt="Computadores portatiles para estudio y trabajo" loading="lazy" referrerpolicy="no-referrer">
+          <span aria-hidden="true">PC</span>
+          <h3>Computadores</h3>
+          <p>Portatiles para estudio, trabajo, gaming y productividad.</p>
+        </article>
+        <article class="category-card" data-animate>
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-accesorios.svg" alt="Accesorios tecnologicos para celulares y computadores" loading="lazy" referrerpolicy="no-referrer">
+          <span aria-hidden="true">USB</span>
+          <h3>Accesorios</h3>
+          <p>Cargadores, audifonos, fundas, teclados y proteccion.</p>
+        </article>
+        <article class="category-card" data-animate>
+          <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-reparacion.svg" alt="Diagnostico tecnico para dispositivos tecnologicos" loading="lazy" referrerpolicy="no-referrer">
+          <span aria-hidden="true">FIX</span>
+          <h3>Diagnostico</h3>
+          <p>Orientacion inicial para fallas comunes sin diagnosticos definitivos.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section promotions" id="promociones" aria-labelledby="promocionesTitle">
+      <div class="section-heading" data-animate>
+        <p class="eyebrow">Ofertas</p>
+        <h2 id="promocionesTitle">Promociones vigentes</h2>
+      </div>
+      <div class="swiper promo-swiper" aria-label="Carrusel de promociones">
+        <div class="swiper-wrapper">
+          <article class="swiper-slide promo-card" data-animate>
+            <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-financiacion.svg" alt="Financiacion para compra de tecnologia" loading="lazy" referrerpolicy="no-referrer">
+            <h3>Celulares con financiacion</h3>
+            <p>Consulta cuotas y disponibilidad con un asesor antes de comprar.</p>
+          </article>
+          <article class="swiper-slide promo-card" data-animate>
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-accesorios.svg" alt="Accesorios tecnologicos en promocion" loading="lazy" referrerpolicy="no-referrer">
+            <h3>Accesorios esenciales</h3>
+            <p>Combina cargador, funda y protector para cuidar tu equipo.</p>
+          </article>
+          <article class="swiper-slide promo-card" data-animate>
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-reparacion.svg" alt="Diagnostico tecnico inicial para equipos" loading="lazy" referrerpolicy="no-referrer">
+            <h3>Diagnostico tecnico inicial</h3>
+            <p>Usa el chatbot para orientar la falla y agenda revision si aplica.</p>
+          </article>
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+      <div class="promo-fallback" hidden>
+        <article class="promo-card" data-animate>
+          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-financiacion.svg" alt="Financiacion para compra de tecnologia" loading="lazy" referrerpolicy="no-referrer">
+          <h3>Celulares con financiacion</h3>
+          <p>Consulta cuotas y disponibilidad con un asesor antes de comprar.</p>
+        </article>
+        <article class="promo-card" data-animate>
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-accesorios.svg" alt="Accesorios tecnologicos en promocion" loading="lazy" referrerpolicy="no-referrer">
+          <h3>Accesorios esenciales</h3>
+          <p>Combina cargador, funda y protector para cuidar tu equipo.</p>
+        </article>
+        <article class="promo-card" data-animate>
+          <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-reparacion.svg" alt="Diagnostico tecnico inicial para equipos" loading="lazy" referrerpolicy="no-referrer">
+          <h3>Diagnostico tecnico inicial</h3>
+          <p>Usa el chatbot para orientar la falla y agenda revision si aplica.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section products" id="productos" aria-labelledby="productosTitle">
+      <div class="section-heading" data-animate>
+        <p class="eyebrow">Productos</p>
+        <h2 id="productosTitle">Destacados de DCS Technology</h2>
+      </div>
+      <form class="search-panel" role="search" aria-label="Buscar productos" data-animate>
+        <label for="productSearch">Buscar por nombre o categoria</label>
+        <input id="productSearch" name="productSearch" type="search" autocomplete="off" maxlength="60" placeholder="Ej: iPhone, tablet, accesorios">
+      </form>
+      <div class="product-grid" id="productGrid" aria-live="polite"></div>
+      <p class="empty-state" id="emptyProducts" hidden>No encontramos productos con ese criterio. Intenta con otra categoria.</p>
+    </section>
+
+    <section class="section financing" id="financiacion" aria-labelledby="financiacionTitle">
+      <div class="financing-copy" data-animate>
+        <p class="eyebrow">Pagos flexibles</p>
+        <h2 id="financiacionTitle">Financiacion para comprar con claridad</h2>
+        <p>DCS Technology orienta sobre opciones como Addi, Sistecredito, credito directo, Nequi y Daviplata. La aprobacion, cuotas y disponibilidad dependen del producto y validacion del asesor.</p>
+        <a class="btn btn-primary" href="https://wa.me/573178765432?text=Hola%2C%20quiero%20informacion%20sobre%20financiacion%20en%20DCS%20Technology" target="_blank" rel="noopener noreferrer">Consultar financiacion</a>
+      </div>
+      <div class="financing-list" data-animate>
+        <article>
+          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-financiacion.svg" alt="Pago y financiacion segura para tecnologia" loading="lazy" referrerpolicy="no-referrer">
+          <h3>Sin datos sensibles en la web</h3>
+          <p>El sitio no recolecta documentos, tarjetas ni informacion personal.</p>
+        </article>
+        <article>
+          <img src="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-financiacion.svg" alt="Asesoria comercial por WhatsApp para tecnologia" loading="lazy" referrerpolicy="no-referrer">
+          <h3>Asesoria por WhatsApp</h3>
+          <p>El asesor confirma requisitos y disponibilidad antes de la compra.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section diagnosis" id="diagnostico" aria-labelledby="diagnosticoTitle">
+      <div class="section-heading" data-animate>
+        <p class="eyebrow">Chatbot local</p>
+        <h2 id="diagnosticoTitle">Diagnostico tecnico inicial sin backend</h2>
+        <p>El asistente responde en tu navegador. No envia mensajes a servidores externos ni entrega diagnosticos definitivos.</p>
+      </div>
+      <div class="diagnosis-grid">
+        <article data-animate>
+          <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-reparacion.svg" alt="Revision tecnica de celulares tablets y computadores" loading="lazy" referrerpolicy="no-referrer">
+          <h3>Fallas comunes</h3>
+          <p>Pantalla rota, no carga, no enciende, bateria, humedad, camara, sobrecalentamiento y computador lento.</p>
+        </article>
+        <article data-animate>
+          <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=900&q=80" data-fallback="assets/img/hero-computadores.svg" alt="Asesoria para comprar tecnologia por presupuesto" loading="lazy" referrerpolicy="no-referrer">
+          <h3>Compra asesorada</h3>
+          <p>Recomendaciones por presupuesto, accesorios y financiacion con contacto directo a WhatsApp cuando conviene.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="contacto" data-animate>
+    <div>
+      <a class="brand" href="#inicio" aria-label="Volver al inicio">
+        <span class="brand-mark" aria-hidden="true">D</span>
+        <span>
+          <strong>DCS Technology</strong>
+          <small>Productos, soporte y financiacion</small>
+        </span>
+      </a>
+      <p>Landing page estatica lista para GitHub Pages, Netlify o Vercel.</p>
+    </div>
+    <address>
+      <strong>Contacto</strong>
+      <a href="https://wa.me/573178765432?text=Hola%2C%20quiero%20informacion%20de%20DCS%20Technology" target="_blank" rel="noopener noreferrer">WhatsApp +57 317 876 5432</a>
+    </address>
+  </footer>
+
+  <a class="whatsapp-float" href="https://wa.me/573178765432?text=Hola%2C%20quiero%20informacion%20sobre%20productos%20y%20servicios%20de%20DCS%20Technology" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp">
+    <img src="assets/icons/whatsapp.svg" alt="" aria-hidden="true" width="30" height="30">
+  </a>
+
+  <section class="chatbot" aria-label="Chatbot tecnico de DCS Technology">
+    <button class="chatbot-toggle" id="chatbotToggle" type="button" aria-label="Abrir chatbot" aria-expanded="false" aria-controls="chatbotPanel">
+      <span class="chatbot-tooltip" role="tooltip">Asistente tecnico</span>
+      <span class="chatbot-online" aria-hidden="true"></span>
+      <span class="chatbot-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" focusable="false">
+          <rect x="8" y="10" width="16" height="14" rx="5"></rect>
+          <path d="M16 10V6"></path>
+          <circle cx="13" cy="17" r="1.4"></circle>
+          <circle cx="19" cy="17" r="1.4"></circle>
+          <path d="M13 21h6"></path>
+          <path d="M6 17h2M24 17h2"></path>
+        </svg>
+      </span>
+      <span class="chatbot-ai-label" aria-hidden="true">AI</span>
+    </button>
+    <div class="chatbot-panel" id="chatbotPanel" hidden>
+      <div class="chatbot-header">
+        <div>
+          <strong>Asistente DCS</strong>
+          <span>Diagnostico local</span>
+        </div>
+        <button id="chatbotClose" type="button" aria-label="Cerrar chatbot">x</button>
+      </div>
+      <div class="chatbot-messages" id="chatMessages" aria-live="polite"></div>
+      <form class="chatbot-form" id="chatForm">
+        <label class="sr-only" for="chatInput">Escribe tu consulta tecnica o comercial</label>
+        <input id="chatInput" type="text" maxlength="220" autocomplete="off" placeholder="Ej: mi celular no carga">
+        <button type="submit" aria-label="Enviar mensaje">Enviar</button>
+      </form>
+    </div>
+  </section>
+</body>
+</html>

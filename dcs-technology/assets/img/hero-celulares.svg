@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Celulares premium">
+  <defs>
+    <linearGradient id="a" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#03050a"/><stop offset="1" stop-color="#0b3a78"/></linearGradient>
+    <linearGradient id="b" x1="0" x2="1"><stop stop-color="#0878ff"/><stop offset="1" stop-color="#43a2ff"/></linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#a)"/>
+  <circle cx="1240" cy="180" r="330" fill="#0878ff" opacity=".18"/>
+  <circle cx="330" cy="860" r="330" fill="#43a2ff" opacity=".12"/>
+  <rect x="860" y="170" width="250" height="540" rx="44" fill="#050812" stroke="#43a2ff" stroke-width="8"/>
+  <rect x="895" y="240" width="180" height="330" rx="26" fill="url(#b)"/>
+  <rect x="620" y="260" width="300" height="600" rx="54" fill="#070d18" stroke="#0878ff" stroke-width="8"/>
+  <rect x="660" y="350" width="220" height="350" rx="30" fill="#111c31"/>
+  <path d="M690 660h190" stroke="#43a2ff" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="770" cy="780" r="18" fill="#1d2b46"/>
+</svg>

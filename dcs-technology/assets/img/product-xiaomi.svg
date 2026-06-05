@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" role="img" aria-label="Xiaomi Redmi">
+  <rect width="640" height="440" fill="#080d16"/>
+  <rect x="160" y="70" width="320" height="260" rx="28" fill="#101827" stroke="#43a2ff" stroke-width="5"/>
+  <rect x="190" y="105" width="260" height="165" rx="16" fill="#0878ff" opacity=".8"/>
+  <path d="M215 250h210" stroke="#ffffff" stroke-width="10" opacity=".8" stroke-linecap="round"/>
+  <rect x="270" y="340" width="100" height="20" rx="10" fill="#1c2a43"/>
+</svg>

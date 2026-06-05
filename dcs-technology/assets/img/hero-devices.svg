@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-label="Dispositivos tecnologicos">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#0878ff"/>
+      <stop offset="1" stop-color="#43a2ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="520" fill="#08101d"/>
+  <circle cx="580" cy="95" r="160" fill="#0878ff" opacity=".18"/>
+  <circle cx="120" cy="460" r="180" fill="#43a2ff" opacity=".12"/>
+  <rect x="120" y="96" width="390" height="250" rx="20" fill="#0d1728" stroke="#2e74d8" stroke-width="4"/>
+  <rect x="145" y="122" width="340" height="190" rx="10" fill="#050812"/>
+  <path d="M170 280 260 190l65 62 70-84 70 112H170Z" fill="url(#g)" opacity=".88"/>
+  <rect x="260" y="350" width="110" height="26" rx="8" fill="#101827"/>
+  <rect x="220" y="380" width="190" height="16" rx="8" fill="#1c2a43"/>
+  <rect x="460" y="154" width="128" height="250" rx="24" fill="#050812" stroke="#43a2ff" stroke-width="4"/>
+  <rect x="478" y="188" width="92" height="168" rx="12" fill="url(#g)" opacity=".92"/>
+  <circle cx="524" cy="376" r="9" fill="#1d2b46"/>
+  <rect x="76" y="198" width="142" height="196" rx="24" fill="#050812" stroke="#0878ff" stroke-width="4"/>
+  <rect x="94" y="232" width="106" height="118" rx="12" fill="#111c31"/>
+  <path d="M108 330h78" stroke="#43a2ff" stroke-width="8" stroke-linecap="round"/>
+</svg>

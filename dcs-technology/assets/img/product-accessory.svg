@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" role="img" aria-label="Accesorios tecnologicos">
+  <rect width="640" height="440" fill="#06101c"/>
+  <circle cx="220" cy="170" r="80" fill="#0878ff" opacity=".22"/>
+  <rect x="180" y="120" width="90" height="150" rx="18" fill="#101827" stroke="#43a2ff" stroke-width="5"/>
+  <path d="M315 150h90c35 0 63 28 63 63v24" stroke="#0878ff" stroke-width="24" stroke-linecap="round" fill="none"/>
+  <circle cx="470" cy="275" r="46" fill="#101827" stroke="#43a2ff" stroke-width="5"/>
+  <path d="M225 270v52c0 35 28 63 63 63h86" stroke="#43a2ff" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

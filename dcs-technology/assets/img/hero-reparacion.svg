@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Diagnostico tecnico">
+  <rect width="1600" height="1000" fill="#03050a"/>
+  <circle cx="1180" cy="210" r="360" fill="#0878ff" opacity=".18"/>
+  <rect x="620" y="180" width="450" height="620" rx="42" fill="#08101d" stroke="#43a2ff" stroke-width="8"/>
+  <rect x="685" y="270" width="320" height="390" rx="28" fill="#101827"/>
+  <path d="M720 390h250M720 470h190M720 550h230" stroke="#43a2ff" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="1090" cy="700" r="105" fill="#0878ff" opacity=".35"/>
+  <path d="m1040 690 50 50 105-130" fill="none" stroke="#f7fbff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M430 700h230" stroke="#0878ff" stroke-width="32" stroke-linecap="round"/>
+  <path d="M480 640l120 120" stroke="#43a2ff" stroke-width="26" stroke-linecap="round"/>
+</svg>

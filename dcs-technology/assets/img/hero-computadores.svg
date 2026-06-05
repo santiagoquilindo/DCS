@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Computadores">
+  <rect width="1600" height="1000" fill="#050812"/>
+  <circle cx="460" cy="850" r="360" fill="#0878ff" opacity=".13"/>
+  <circle cx="1240" cy="190" r="310" fill="#43a2ff" opacity=".15"/>
+  <rect x="390" y="210" width="780" height="470" rx="32" fill="#0b1220" stroke="#43a2ff" stroke-width="8"/>
+  <rect x="455" y="280" width="650" height="320" rx="18" fill="#03050a"/>
+  <path d="M500 560 680 390l130 120 150-190 170 240H500Z" fill="#0878ff"/>
+  <path d="M330 710h930l95 120H235l95-120Z" fill="#101827"/>
+  <path d="M650 780h310" stroke="#43a2ff" stroke-width="18" stroke-linecap="round"/>
+</svg>
