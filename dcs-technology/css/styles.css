@@ -84,6 +84,14 @@ a {
   text-decoration: none;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid rgba(127, 216, 255, 0.86);
+  outline-offset: 3px;
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -1648,11 +1656,11 @@ h3 {
   }
 
   .hero-card-track {
-    grid-auto-columns: minmax(150px, 72vw);
+    grid-auto-columns: min(260px, 78vw);
   }
 
   .hero-card {
-    min-height: 210px;
+    min-height: 230px;
   }
 
   .btn,

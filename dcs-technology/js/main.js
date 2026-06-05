@@ -5,14 +5,12 @@ const MAX_QUERY_LENGTH = 60;
 const MAX_CHAT_LENGTH = 220;
 const HERO_AUTOPLAY_MS = 4000;
 
-// Las imagenes externas usadas en el hero son temporales. Antes de publicar comercialmente,
-// deben reemplazarse por imagenes propias o imagenes con licencia valida almacenadas en `assets/img/`.
 const heroSlides = [
   {
     category: "Celulares premium",
     title: "Tecnologia movil de alto nivel",
     subtitle: "Celulares modernos, potentes y listos para trabajo, estudio y entretenimiento.",
-    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1600&q=80",
+    image: "assets/img/hero-celulares.svg",
     fallbackImage: "assets/img/hero-celulares.svg",
     alt: "Celulares premium disponibles en DCS Technology"
   },
@@ -20,7 +18,7 @@ const heroSlides = [
     category: "Diagnostico tecnico",
     title: "Revision tecnica inteligente",
     subtitle: "Detectamos posibles fallas en pantalla, bateria, carga, software y rendimiento.",
-    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80",
+    image: "assets/img/hero-reparacion.svg",
     fallbackImage: "assets/img/hero-reparacion.svg",
     alt: "Servicio de diagnostico tecnico para celulares y computadores"
   },
@@ -28,7 +26,7 @@ const heroSlides = [
     category: "Computadores",
     title: "Equipos para productividad y gaming",
     subtitle: "Portatiles y computadores para estudio, oficina, diseno y alto rendimiento.",
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1600&q=80",
+    image: "assets/img/hero-computadores.svg",
     fallbackImage: "assets/img/hero-computadores.svg",
     alt: "Computadores y portatiles para productividad y gaming"
   },
@@ -36,7 +34,7 @@ const heroSlides = [
     category: "Accesorios",
     title: "Accesorios que completan tu experiencia",
     subtitle: "Audifonos, cargadores, fundas, cables, soportes y dispositivos inteligentes.",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=80",
+    image: "assets/img/hero-accesorios.svg",
     fallbackImage: "assets/img/hero-accesorios.svg",
     alt: "Accesorios tecnologicos para celulares y computadores"
   },
@@ -44,7 +42,7 @@ const heroSlides = [
     category: "Smartwatch",
     title: "Tecnologia conectada a tu ritmo",
     subtitle: "Relojes inteligentes para salud, notificaciones, deporte y productividad.",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=80",
+    image: "assets/img/hero-smartwatch.svg",
     fallbackImage: "assets/img/hero-smartwatch.svg",
     alt: "Smartwatch y tecnologia conectada"
   },
@@ -52,7 +50,7 @@ const heroSlides = [
     category: "Financiacion",
     title: "Compra tecnologia con facilidad",
     subtitle: "Opciones de financiacion para estrenar equipos sin complicaciones.",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80",
+    image: "assets/img/hero-financiacion.svg",
     fallbackImage: "assets/img/hero-financiacion.svg",
     alt: "Financiacion tecnologica para productos DCS Technology"
   }
@@ -63,7 +61,7 @@ const products = [
     name: "iPhone 15 Pro",
     category: "Celulares",
     price: "$3.999.000",
-    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80",
+    image: "assets/img/product-phone.svg",
     fallbackImage: "assets/img/product-phone.svg",
     description: "Equipo premium para fotografia, video y alto rendimiento diario."
   },
@@ -71,7 +69,7 @@ const products = [
     name: "Samsung Galaxy S24 FE",
     category: "Celulares",
     price: "$2.499.000",
-    image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=80",
+    image: "assets/img/product-samsung.svg",
     fallbackImage: "assets/img/product-samsung.svg",
     description: "Gama alta equilibrada para productividad, fotografia y entretenimiento."
   },
@@ -79,7 +77,7 @@ const products = [
     name: "Xiaomi Redmi Note 13",
     category: "Celulares",
     price: "$1.199.000",
-    image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=900&q=80",
+    image: "assets/img/product-xiaomi.svg",
     fallbackImage: "assets/img/product-xiaomi.svg",
     description: "Buena autonomia y pantalla amplia para presupuesto controlado."
   },
@@ -87,7 +85,7 @@ const products = [
     name: "Galaxy Tab S9",
     category: "Tablets",
     price: "$1.849.000",
-    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=900&q=80",
+    image: "assets/img/product-tablet.svg",
     fallbackImage: "assets/img/product-tablet.svg",
     description: "Tablet para estudio, contenido, dibujo y productividad movil."
   },
@@ -95,7 +93,7 @@ const products = [
     name: "MacBook Air M2",
     category: "Computadores",
     price: "$5.299.000",
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80",
+    image: "assets/img/product-laptop.svg",
     fallbackImage: "assets/img/product-laptop.svg",
     description: "Portatil liviano para trabajo profesional, estudio y creacion."
   },
@@ -103,7 +101,7 @@ const products = [
     name: "Kit cargador rapido USB-C",
     category: "Accesorios",
     price: "$129.000",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80",
+    image: "assets/img/product-accessory.svg",
     fallbackImage: "assets/img/product-accessory.svg",
     description: "Cargador y cable de carga rapida para equipos compatibles."
   }
@@ -620,6 +618,9 @@ function setupAnimationsSafely() {
   });
 
   elements.forEach((element) => window.cinematicObserver.observe(element));
+  window.setTimeout(() => {
+    elements.forEach((element) => element.classList.add("is-visible"));
+  }, 1200);
 }
 
 function revealAnimatedElement(element) {
