@@ -8,51 +8,51 @@ const HERO_AUTOPLAY_MS = 4000;
 const heroSlides = [
   {
     category: "Celulares premium",
-    title: "Tecnologia movil de alto nivel",
+    title: "Tecnología móvil de alto nivel",
     subtitle: "Celulares modernos, potentes y listos para trabajo, estudio y entretenimiento.",
     image: "assets/img/hero-celulares.svg",
     fallbackImage: "assets/img/hero-celulares.svg",
     alt: "Celulares premium disponibles en DCS Technology"
   },
   {
-    category: "Diagnostico tecnico",
-    title: "Revision tecnica inteligente",
-    subtitle: "Detectamos posibles fallas en pantalla, bateria, carga, software y rendimiento.",
-    image: "assets/img/hero-reparacion.svg",
-    fallbackImage: "assets/img/hero-reparacion.svg",
-    alt: "Servicio de diagnostico tecnico para celulares y computadores"
+    category: "Diagnóstico técnico",
+    title: "Revisión técnica inteligente",
+    subtitle: "Detectamos posibles fallas en pantalla, batería, carga, software y rendimiento.",
+    image: "assets/img/hero-reparación.svg",
+    fallbackImage: "assets/img/hero-reparación.svg",
+    alt: "Servicio de diagnóstico técnico para celulares y computadores"
   },
   {
     category: "Computadores",
     title: "Equipos para productividad y gaming",
-    subtitle: "Portatiles y computadores para estudio, oficina, diseno y alto rendimiento.",
+    subtitle: "Portátiles y computadores para estudio, oficina, diseño y alto rendimiento.",
     image: "assets/img/hero-computadores.svg",
     fallbackImage: "assets/img/hero-computadores.svg",
-    alt: "Computadores y portatiles para productividad y gaming"
+    alt: "Computadores y portátiles para productividad y gaming"
   },
   {
     category: "Accesorios",
     title: "Accesorios que completan tu experiencia",
-    subtitle: "Audifonos, cargadores, fundas, cables, soportes y dispositivos inteligentes.",
+    subtitle: "Audífonos, cargadores, fundas, cables, soportes y dispositivos inteligentes.",
     image: "assets/img/hero-accesorios.svg",
     fallbackImage: "assets/img/hero-accesorios.svg",
-    alt: "Accesorios tecnologicos para celulares y computadores"
+    alt: "Accesorios tecnológicos para celulares y computadores"
   },
   {
     category: "Smartwatch",
-    title: "Tecnologia conectada a tu ritmo",
+    title: "Tecnología conectada a tu ritmo",
     subtitle: "Relojes inteligentes para salud, notificaciones, deporte y productividad.",
     image: "assets/img/hero-smartwatch.svg",
     fallbackImage: "assets/img/hero-smartwatch.svg",
-    alt: "Smartwatch y tecnologia conectada"
+    alt: "Smartwatch y tecnología conectada"
   },
   {
-    category: "Financiacion",
-    title: "Compra tecnologia con facilidad",
-    subtitle: "Opciones de financiacion para estrenar equipos sin complicaciones.",
-    image: "assets/img/hero-financiacion.svg",
-    fallbackImage: "assets/img/hero-financiacion.svg",
-    alt: "Financiacion tecnologica para productos DCS Technology"
+    category: "Financiación",
+    title: "Compra tecnología con facilidad",
+    subtitle: "Opciones de financiación para estrenar equipos sin complicaciones.",
+    image: "assets/img/hero-financiación.svg",
+    fallbackImage: "assets/img/hero-financiación.svg",
+    alt: "Financiación tecnológica para productos DCS Technology"
   }
 ];
 
@@ -63,7 +63,7 @@ const products = [
     price: "$3.999.000",
     image: "assets/img/product-phone.svg",
     fallbackImage: "assets/img/product-phone.svg",
-    description: "Equipo premium para fotografia, video y alto rendimiento diario."
+    description: "Equipo premium para fotografía, video y alto rendimiento diario."
   },
   {
     name: "Samsung Galaxy S24 FE",
@@ -71,7 +71,7 @@ const products = [
     price: "$2.499.000",
     image: "assets/img/product-samsung.svg",
     fallbackImage: "assets/img/product-samsung.svg",
-    description: "Gama alta equilibrada para productividad, fotografia y entretenimiento."
+    description: "Gama alta equilibrada para productividad, fotografía y entretenimiento."
   },
   {
     name: "Xiaomi Redmi Note 13",
@@ -79,7 +79,7 @@ const products = [
     price: "$1.199.000",
     image: "assets/img/product-xiaomi.svg",
     fallbackImage: "assets/img/product-xiaomi.svg",
-    description: "Buena autonomia y pantalla amplia para presupuesto controlado."
+    description: "Buena autonomía y pantalla amplia para presupuesto controlado."
   },
   {
     name: "Galaxy Tab S9",
@@ -87,7 +87,7 @@ const products = [
     price: "$1.849.000",
     image: "assets/img/product-tablet.svg",
     fallbackImage: "assets/img/product-tablet.svg",
-    description: "Tablet para estudio, contenido, dibujo y productividad movil."
+    description: "Tablet para estudio, contenido, dibujo y productividad móvil."
   },
   {
     name: "MacBook Air M2",
@@ -95,15 +95,15 @@ const products = [
     price: "$5.299.000",
     image: "assets/img/product-laptop.svg",
     fallbackImage: "assets/img/product-laptop.svg",
-    description: "Portatil liviano para trabajo profesional, estudio y creacion."
+    description: "Portátil liviano para trabajo profesional, estudio y creación."
   },
   {
-    name: "Kit cargador rapido USB-C",
+    name: "Kit cargador rápido USB-C",
     category: "Accesorios",
     price: "$129.000",
     image: "assets/img/product-accessory.svg",
     fallbackImage: "assets/img/product-accessory.svg",
-    description: "Cargador y cable de carga rapida para equipos compatibles."
+    description: "Cargador y cable de carga rápida para equipos compatibles."
   }
 ];
 
@@ -126,10 +126,10 @@ const chatState = {
 };
 
 const quickActions = [
-  "Diagnostico tecnico",
+  "Diagnóstico técnico",
   "Quiero comprar",
   "Cotizar producto",
-  "Financiacion",
+  "Financiación",
   "Comparar equipos",
   "Accesorios",
   "Computador ideal",
@@ -144,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSmoothLinks();
   setupProducts();
   setupChatbot();
-  setupSwiperSafely();
   setupAnimationsSafely();
 });
 
@@ -430,7 +429,8 @@ function setupProducts() {
       grid.appendChild(card);
       if (window.cinematicObserver) revealAnimatedElement(card);
     });
-    emptyState.hidden = items.length > 0;
+    emptyState.hidden = true;
+    emptyState.textContent = "";
   };
 
   search.addEventListener("input", () => {
@@ -441,6 +441,10 @@ function setupProducts() {
       return haystack.includes(term);
     });
     render(filtered);
+    if (term && filtered.length === 0) {
+      emptyState.textContent = "No encontramos productos con ese criterio. Intenta con otra categoría.";
+      emptyState.hidden = false;
+    }
   });
 
   render(products);
@@ -517,7 +521,7 @@ function createProductCard(product) {
 
   const wa = document.createElement("a");
   wa.className = "btn whatsapp-btn";
-  wa.href = whatsappUrl(`Hola, quiero informacion sobre ${product.name} en DCS Technology.`);
+  wa.href = whatsappUrl(`Hola, quiero información sobre ${product.name} en DCS Technology.`);
   wa.target = "_blank";
   wa.rel = "noopener noreferrer";
   wa.textContent = "WhatsApp";
@@ -547,7 +551,7 @@ function configureProductImage(image, product) {
 }
 
 function openProductDetail(product) {
-  const message = `${product.name}. Categoria: ${product.category}. ${product.description} No muestro precios exactos en el asistente. Un asesor puede validar disponibilidad, garantia y cotizacion personalizada por WhatsApp.`;
+  const message = `${product.name}. Categoría: ${product.category}. ${product.description} No muestro precios exactos en el asistente. Un asesor puede validar disponibilidad, garantía y cotización personalizada por WhatsApp.`;
   addSystemNotice(message);
 }
 
@@ -562,38 +566,6 @@ function addSystemNotice(text) {
   panel.hidden = false;
   toggle.setAttribute("aria-expanded", "true");
   appendMessage(messages, text, "bot");
-}
-
-function setupSwiperSafely() {
-  const container = document.querySelector(".promo-swiper");
-  const fallback = document.querySelector(".promo-fallback");
-  if (!container) return;
-
-  if (typeof window.Swiper !== "function") {
-    container.hidden = true;
-    if (fallback) fallback.hidden = false;
-    return;
-  }
-
-  try {
-    new window.Swiper(container, {
-      loop: true,
-      slidesPerView: 1,
-      spaceBetween: 16,
-      pagination: {
-        el: ".swiper-pagination",
-        clickable: true
-      },
-      breakpoints: {
-        760: { slidesPerView: 2 },
-        1024: { slidesPerView: 3 }
-      }
-    });
-  } catch (error) {
-    container.hidden = true;
-    if (fallback) fallback.hidden = false;
-    console.warn("Swiper no se pudo inicializar. Se activo el fallback estatico.", error);
-  }
 }
 
 function setupAnimationsSafely() {
@@ -645,8 +617,8 @@ function setupChatbot() {
   appendBotCard(messages, {
     title: "Asistente Inteligente DCS Technology",
     lines: [
-      "Ventas, cotizacion, diagnostico preliminar, financiacion y accesorios.",
-      "No doy precios exactos ni diagnosticos definitivos; un asesor puede validar la cotizacion."
+      "Ventas, cotización, diagnóstico preliminar, financiación y accesorios.",
+      "No doy precios exactos ni diagnósticos definitivos; un asesor puede validar la cotización."
     ]
   });
   appendQuickActions(messages, quickActions);
@@ -671,7 +643,7 @@ function setupChatbot() {
     if (!clean) {
       appendBotCard(messages, {
         title: "Consulta requerida",
-        lines: ["Escribe una consulta sobre tecnologia, diagnostico tecnico, compra, financiacion o accesorios."]
+        lines: ["Escribe una consulta sobre tecnología, diagnóstico técnico, compra, financiación o accesorios."]
       });
       return;
     }
@@ -700,7 +672,7 @@ function processChatMessage(messages, clean) {
   if (intent === "tema ajeno") {
     appendBotCard(messages, {
       title: "Alcance del asistente",
-      lines: ["Puedo ayudarte unicamente con productos tecnologicos, diagnostico tecnico, accesorios, financiacion y servicios de DCS Technology."]
+      lines: ["Puedo ayudarte únicamente con productos tecnológicos, diagnóstico técnico, accesorios, financiación y servicios de DCS Technology."]
     });
     return;
   }
@@ -708,13 +680,13 @@ function processChatMessage(messages, clean) {
   if (intent === "saludo") {
     appendBotCard(messages, {
       title: "Hola, soy tu asistente DCS",
-      lines: ["Elige una opcion rapida o cuentame si necesitas comprar, cotizar, comparar equipos, financiar o revisar una falla."]
+      lines: ["Elige una opción rápida o cuéntame si necesitas comprar, cotizar, comparar equipos, financiar o revisar una falla."]
     });
     appendQuickActions(messages, quickActions);
     return;
   }
 
-  if (intent === "diagnostico") {
+  if (intent === "diagnóstico") {
     startDiagnosticFlow(messages, clean);
     return;
   }
@@ -724,7 +696,7 @@ function processChatMessage(messages, clean) {
     return;
   }
 
-  if (intent === "compra" || intent === "cotizacion") {
+  if (intent === "compra" || intent === "cotización") {
     startQuoteFlow(messages, clean);
     return;
   }
@@ -734,12 +706,12 @@ function processChatMessage(messages, clean) {
     return;
   }
 
-  if (intent === "financiacion") {
+  if (intent === "financiación") {
     appendFinancingResponse(messages);
     return;
   }
 
-  if (intent === "comparacion") {
+  if (intent === "comparación") {
     appendComparisonResponse(messages, clean);
     return;
   }
@@ -754,70 +726,70 @@ function processChatMessage(messages, clean) {
     return;
   }
 
-  if (intent === "garantia") {
+  if (intent === "garantía") {
     appendBotCard(messages, {
-      title: "Garantia",
+      title: "Garantía",
       lines: [
-        "La garantia depende del producto, estado, proveedor y condiciones de compra.",
-        "Un asesor puede validar cobertura, tiempos y requisitos antes de cualquier tramite."
+        "La garantía depende del producto, estado, proveedor y condiciones de compra.",
+        "Un asesor puede validar cobertura, tiempos y requisitos antes de cualquier trámite."
       ],
       action: {
-        label: "Consultar garantia por WhatsApp",
-        message: "Hola, quiero validar una garantia con DCS Technology."
+        label: "Consultar garantía por WhatsApp",
+        message: "Hola, quiero validar una garantía con DCS Technology."
       }
     });
     return;
   }
 
   appendBotCard(messages, {
-    title: "Necesito un poco mas de contexto",
+    title: "Necesito un poco más de contexto",
     lines: [
-      "Puedo ayudarte con diagnostico preliminar, cotizacion sin precios exactos, financiacion, comparacion, computadores o accesorios.",
-      "Tambien puedo generar un mensaje para WhatsApp si necesitas un asesor."
+      "Puedo ayudarte con diagnóstico preliminar, cotización sin precios exactos, financiación, comparación, computadores o accesorios.",
+      "También puedo generar un mensaje para WhatsApp si necesitas un asesor."
     ]
   });
   appendQuickActions(messages, quickActions);
 }
 
 function classifyIntent(text) {
-  if (matches(text, ["politica", "futbol", "clima", "religion", "farandula", "noticia", "receta", "cocina"])) return "tema ajeno";
-  if (matches(text, ["hola", "buenas", "buen dia", "saludos", "ayuda"])) return "saludo";
-  if (matches(text, ["cayo al agua", "se mojo", "humedad", "liquido", "lluvia", "mojado", "agua"])) return "daño por agua";
-  if (matches(text, ["quiero que me contacten", "necesito asesor", "agenda revision", "agendar revision", "estoy interesado", "contacten", "hablar por whatsapp", "whatsapp"])) return "lead";
-  if (matches(text, ["financiacion", "financiar", "cuotas", "credito", "addi", "sistecredito", "nequi", "daviplata", "pagar por partes"])) return "financiacion";
-  if (matches(text, [" vs ", "versus", "comparar", "que es mejor", "iphone o android"])) return "comparacion";
-  if (matches(text, ["portatil", "computador", "pc", "laptop", "programar", "diseño", "gaming", "computador lento"])) return "computador";
-  if (matches(text, ["cargador", "cable", "audifono", "audifonos", "smartwatch", "adaptador", "funda", "protector", "accesorio"])) return "accesorio";
-  if (matches(text, ["comprar", "cotizar", "cotizacion", "quiero un", "quiero una", "producto", "celular", "tablet", "smartwatch"])) return text.includes("cotiz") ? "cotizacion" : "compra";
-  if (matches(text, ["diagnostico", "pantalla", "no carga", "no enciende", "bateria", "sobrecalienta", "camara", "sonido", "software", "virus", "apps sospechosas", "falla", "daño", "reparacion"])) return "diagnostico";
-  if (matches(text, ["garantia", "garantía"])) return "garantia";
+  if (matches(text, ["política", "fútbol", "clima", "religión", "farándula", "noticia", "receta", "cocina"])) return "tema ajeno";
+  if (matches(text, ["hola", "buenas", "buen día", "saludos", "ayuda"])) return "saludo";
+  if (matches(text, ["cayó al agua", "se mojó", "humedad", "líquido", "lluvia", "mojado", "agua"])) return "daño por agua";
+  if (matches(text, ["quiero que me contacten", "necesito asesor", "agenda revisión", "agendar revisión", "estoy interesado", "contacten", "hablar por whatsapp", "whatsapp"])) return "lead";
+  if (matches(text, ["financiación", "financiar", "cuotas", "crédito", "addi", "sistecrédito", "nequi", "daviplata", "pagar por partes"])) return "financiación";
+  if (matches(text, [" vs ", "versus", "comparar", "qué es mejor", "iphone o android"])) return "comparación";
+  if (matches(text, ["portátil", "computador", "pc", "laptop", "programar", "diseño", "gaming", "computador lento"])) return "computador";
+  if (matches(text, ["cargador", "cable", "audífono", "audífonos", "smartwatch", "adaptador", "funda", "protector", "accesorio"])) return "accesorio";
+  if (matches(text, ["comprar", "cotizar", "cotización", "quiero un", "quiero una", "producto", "celular", "tablet", "smartwatch"])) return text.includes("cotiz") ? "cotización" : "compra";
+  if (matches(text, ["diagnóstico", "pantalla", "no carga", "no enciende", "batería", "sobrecalienta", "cámara", "sonido", "software", "virus", "apps sospechosas", "falla", "daño", "reparación"])) return "diagnóstico";
+  if (matches(text, ["garantía", "garantía"])) return "garantía";
   return "desconocido";
 }
 
 function startDiagnosticFlow(messages, initialText) {
-  resetChatFlow("diagnostico", "deviceType");
+  resetChatFlow("diagnóstico", "deviceType");
   chatState.issue = detectIssue(normalizeChatText(initialText)) || sanitizeText(initialText, 80);
   appendBotCard(messages, {
-    title: "Diagnostico tecnico guiado",
+    title: "Diagnóstico técnico guiado",
     lines: [
-      "Hare preguntas cortas para crear un diagnostico preliminar.",
-      "No es un diagnostico definitivo; puede requerir revision tecnica."
+      "Haré preguntas cortas para crear un diagnóstico preliminar.",
+      "No es un diagnóstico definitivo; puede requerir revisión técnica."
     ]
   });
-  askFlowQuestion(messages, "Tipo de dispositivo", "Que equipo deseas revisar: celular, tablet, computador o smartwatch?");
+  askFlowQuestion(messages, "Tipo de dispositivo", "¿Qué equipo deseas revisar: celular, tablet, computador o smartwatch?");
 }
 
 function startQuoteFlow(messages, initialText) {
-  resetChatFlow("cotizacion", "productType");
+  resetChatFlow("cotización", "productType");
   chatState.leadProductOrIssue = sanitizeText(initialText, 90);
   appendBotCard(messages, {
     title: "Cotizador inteligente",
     lines: [
-      "Te orientare sin mostrar precios exactos.",
-      "Al final, un asesor puede validar disponibilidad y cotizacion personalizada."
+      "Te orientaré sin mostrar precios exactos.",
+      "Al final, un asesor puede validar disponibilidad y cotización personalizada."
     ]
   });
-  askFlowQuestion(messages, "Tipo de producto", "Que deseas cotizar: celular, computador, tablet, smartwatch, audifonos o accesorios?");
+  askFlowQuestion(messages, "Tipo de producto", "¿Qué deseas cotizar: celular, computador, tablet, smartwatch, audífonos o accesorios?");
 }
 
 function startLeadFlow(messages, initialText) {
@@ -825,17 +797,17 @@ function startLeadFlow(messages, initialText) {
   chatState.leadProductOrIssue = sanitizeText(initialText, 90);
   appendBotCard(messages, {
     title: "Contacto con asesor",
-    lines: ["No guardo datos en servidor. Solo creare un mensaje prellenado para WhatsApp."]
+    lines: ["No guardo datos en servidor. Solo crearé un mensaje prellenado para WhatsApp."]
   });
-  askFlowQuestion(messages, "Nombre", "Cual es tu nombre?");
+  askFlowQuestion(messages, "Nombre", "¿Cuál es tu nombre?");
 }
 
 function continueChatFlow(messages, clean, text) {
-  if (chatState.flow === "diagnostico") {
+  if (chatState.flow === "diagnóstico") {
     continueDiagnosticFlow(messages, clean, text);
     return;
   }
-  if (chatState.flow === "cotizacion") {
+  if (chatState.flow === "cotización") {
     continueQuoteFlow(messages, clean, text);
     return;
   }
@@ -849,37 +821,37 @@ function continueDiagnosticFlow(messages, clean, text) {
   if (chatState.step === "deviceType") {
     chatState.deviceType = value;
     chatState.step = "brand";
-    askFlowQuestion(messages, "Marca", "Cual es la marca del equipo?");
+    askFlowQuestion(messages, "Marca", "¿Cuál es la marca del equipo?");
     return;
   }
   if (chatState.step === "brand") {
     chatState.brand = value;
     chatState.step = "model";
-    askFlowQuestion(messages, "Modelo", "Cual es el modelo aproximado?");
+    askFlowQuestion(messages, "Modelo", "¿Cuál es el modelo aproximado?");
     return;
   }
   if (chatState.step === "model") {
     chatState.model = value;
     chatState.step = "issue";
-    askFlowQuestion(messages, "Falla principal", "Cual es la falla principal?");
+    askFlowQuestion(messages, "Falla principal", "¿Cuál es la falla principal?");
     return;
   }
   if (chatState.step === "issue") {
     chatState.issue = value;
     chatState.step = "impact";
-    askFlowQuestion(messages, "Golpe o humedad", "Tuvo golpe, contacto con agua o humedad?");
+    askFlowQuestion(messages, "Golpe o humedad", "¿Tuvo golpe, contacto con agua o humedad?");
     return;
   }
   if (chatState.step === "impact") {
     chatState.answers.impact = value;
     chatState.step = "power";
-    askFlowQuestion(messages, "Carga y encendido", "El equipo carga y enciende? Responde con lo que observes.");
+    askFlowQuestion(messages, "Carga y encendido", "¿El equipo carga y enciende? Responde con lo que observes.");
     return;
   }
   if (chatState.step === "power") {
     chatState.answers.power = value;
     chatState.step = "time";
-    askFlowQuestion(messages, "Tiempo de falla", "Hace cuanto empezo la falla?");
+    askFlowQuestion(messages, "Tiempo de falla", "¿Hace cuánto empezó la falla?");
     return;
   }
   if (chatState.step === "time") {
@@ -893,17 +865,17 @@ function finishDiagnosticFlow(messages) {
   const causes = getPossibleCauses(issueText);
   const urgency = getUrgency(issueText);
   const recommendation = urgency === "Alto"
-    ? "Evita seguir usando el equipo y solicita revision tecnica cuanto antes."
-    : "Se recomienda revision tecnica para confirmar causa y cotizacion.";
+    ? "Evita seguir usando el equipo y solicita revisión técnica cuanto antes."
+    : "Se recomienda revisión técnica para confirmar causa y cotización.";
 
   appendBotCard(messages, {
-    title: "Diagnostico preliminar",
+    title: "Diagnóstico preliminar",
     rows: [
       ["Dispositivo", `${chatState.deviceType || "No indicado"} ${chatState.brand || ""} ${chatState.model || ""}`.trim()],
       ["Falla reportada", chatState.issue || "No indicada"],
       ["Posibles causas", causes.join(", ")],
       ["Nivel de urgencia", urgency],
-      ["Recomendacion", recommendation]
+      ["Recomendación", recommendation]
     ],
     action: {
       label: "Contactar asesor por WhatsApp",
@@ -918,19 +890,19 @@ function continueQuoteFlow(messages, clean) {
   if (chatState.step === "productType") {
     chatState.deviceType = value;
     chatState.step = "usage";
-    askFlowQuestion(messages, "Uso principal", "Uso principal: estudio, trabajo, gaming, redes sociales, fotografia o negocio?");
+    askFlowQuestion(messages, "Uso principal", "Uso principal: estudio, trabajo, gaming, redes sociales, fotografía o negocio?");
     return;
   }
   if (chatState.step === "usage") {
     chatState.usage = value;
     chatState.step = "budgetRange";
-    askFlowQuestion(messages, "Rango", "Que rango buscas: economico, gama media, gama alta o premium?");
+    askFlowQuestion(messages, "Rango", "¿Qué rango buscas: económico, gama media, gama alta o premium?");
     return;
   }
   if (chatState.step === "budgetRange") {
     chatState.budgetRange = value;
     chatState.step = "preference";
-    askFlowQuestion(messages, "Preferencia", "Que priorizas: bateria, camara, rendimiento, almacenamiento, diseño, garantia o financiacion?");
+    askFlowQuestion(messages, "Preferencia", "¿Qué priorizas: batería, cámara, rendimiento, almacenamiento, diseño, garantía o financiación?");
     return;
   }
   if (chatState.step === "preference") {
@@ -942,10 +914,10 @@ function continueQuoteFlow(messages, clean) {
 function finishQuoteFlow(messages) {
   const recommendation = buildQuoteRecommendation();
   appendBotCard(messages, {
-    title: "Recomendacion comercial",
+    title: "Recomendación comercial",
     lines: [
       recommendation,
-      "No muestro precios exactos por este medio. Un asesor puede validar disponibilidad y cotizacion personalizada."
+      "No muestro precios exactos por este medio. Un asesor puede validar disponibilidad y cotización personalizada."
     ],
     rows: [
       ["Producto", chatState.deviceType || "No indicado"],
@@ -954,8 +926,8 @@ function finishQuoteFlow(messages) {
       ["Prioridad", chatState.preference || "No indicada"]
     ],
     action: {
-      label: "Solicitar cotizacion por WhatsApp",
-      message: `Hola, quiero una cotizacion en DCS Technology. Producto: ${chatState.deviceType || "por definir"}. Uso: ${chatState.usage || "por definir"}. Rango: ${chatState.budgetRange || "por definir"}. Prioridad: ${chatState.preference || "por definir"}.`
+      label: "Solicitar cotización por WhatsApp",
+      message: `Hola, quiero una cotización en DCS Technology. Producto: ${chatState.deviceType || "por definir"}. Uso: ${chatState.usage || "por definir"}. Rango: ${chatState.budgetRange || "por definir"}. Prioridad: ${chatState.preference || "por definir"}.`
     }
   });
   clearChatFlow();
@@ -966,26 +938,26 @@ function continueLeadFlow(messages, clean) {
   if (chatState.step === "leadName") {
     chatState.leadName = value;
     chatState.step = "leadProductOrIssue";
-    askFlowQuestion(messages, "Producto o falla", "Que producto o falla quieres consultar?");
+    askFlowQuestion(messages, "Producto o falla", "¿Qué producto o falla quieres consultar?");
     return;
   }
   if (chatState.step === "leadProductOrIssue") {
     chatState.leadProductOrIssue = value;
     chatState.step = "leadCity";
-    askFlowQuestion(messages, "Ciudad", "En que ciudad estas?");
+    askFlowQuestion(messages, "Ciudad", "¿En qué ciudad estás?");
     return;
   }
   if (chatState.step === "leadCity") {
     chatState.leadCity = value;
     chatState.step = "leadContact";
-    askFlowQuestion(messages, "Contacto", "Que medio de contacto prefieres?");
+    askFlowQuestion(messages, "Contacto", "¿Qué medio de contacto prefieres?");
     return;
   }
   if (chatState.step === "leadContact") {
     chatState.leadContact = value;
     appendBotCard(messages, {
       title: "Mensaje listo para WhatsApp",
-      lines: ["No guardo estos datos. Solo se usaran para abrir WhatsApp con el mensaje prellenado."],
+      lines: ["No guardo estos datos. Solo se usarán para abrir WhatsApp con el mensaje prellenado."],
       action: {
         label: "Enviar datos por WhatsApp",
         message: `Hola, soy ${chatState.leadName || "cliente"}. Estoy en ${chatState.leadCity || "mi ciudad"}. Quiero consultar: ${chatState.leadProductOrIssue || "producto o falla"}. Medio de contacto preferido: ${chatState.leadContact || "WhatsApp"}.`
@@ -1001,12 +973,12 @@ function appendWaterDamageResponse(messages) {
     rows: [
       ["Nivel de riesgo", "Alto"],
       ["No hacer", "No cargar, no encender repetidamente, no usar secador caliente, no agitar demasiado."],
-      ["Hacer", "Apagar, retirar funda, secar exterior y llevar a revision tecnica."],
-      ["Recomendacion", "Requiere revision tecnica para evaluar posible corrosion o daño interno."]
+      ["Hacer", "Apagar, retirar funda, secar exterior y llevar a revisión técnica."],
+      ["Recomendación", "Requiere revisión técnica para evaluar posible corrosión o daño interno."]
     ],
     action: {
-      label: "Solicitar revision por WhatsApp",
-      message: "Hola, mi equipo tuvo contacto con agua o humedad. Necesito revision tecnica en DCS Technology."
+      label: "Solicitar revisión por WhatsApp",
+      message: "Hola, mi equipo tuvo contacto con agua o humedad. Necesito revisión técnica en DCS Technology."
     }
   });
 }
@@ -1015,12 +987,12 @@ function appendFinancingResponse(messages) {
   appendBotCard(messages, {
     title: "Financiacion",
     lines: [
-      "La financiacion depende del perfil, validacion de cupo, documento requerido y condiciones del producto.",
-      "La aprobacion esta sujeta a validacion; no puedo prometer aprobacion ni cuotas exactas."
+      "La financiación depende del perfil, validación de cupo, documento requerido y condiciones del producto.",
+      "La aprobación está sujeta a validación; no puedo prometer aprobación ni cuotas exactas."
     ],
     action: {
-      label: "Consultar financiacion por WhatsApp",
-      message: "Hola, quiero consultar opciones de financiacion en DCS Technology."
+      label: "Consultar financiación por WhatsApp",
+      message: "Hola, quiero consultar opciones de financiación en DCS Technology."
     }
   });
 }
@@ -1029,13 +1001,13 @@ function appendComparisonResponse(messages, clean) {
   appendBotCard(messages, {
     title: "Comparacion de equipos",
     rows: [
-      ["Rendimiento", "Depende del procesador, memoria, optimizacion y uso principal."],
-      ["Camara", "Conviene revisar estabilizacion, sensor, video y fotos nocturnas."],
-      ["Bateria", "Importan capacidad, eficiencia y velocidad de carga compatible."],
-      ["Pantalla", "Evalua brillo, tasa de refresco, resolucion y resistencia."],
-      ["Sistema operativo", "iOS suele destacar por ecosistema; Android por variedad y personalizacion."],
-      ["Uso recomendado", "La mejor opcion depende de tu prioridad: camara, bateria, gaming, trabajo o garantia."],
-      ["Conclusion", "Para una recomendacion exacta segun disponibilidad, solicita asesoria por WhatsApp."]
+      ["Rendimiento", "Depende del procesador, memoria, optimización y uso principal."],
+      ["Cámara", "Conviene revisar estabilización, sensor, video y fotos nocturnas."],
+      ["Batería", "Importan capacidad, eficiencia y velocidad de carga compatible."],
+      ["Pantalla", "Evalúa brillo, tasa de refresco, resolución y resistencia."],
+      ["Sistema operativo", "iOS suele destacar por ecosistema; Android por variedad y personalización."],
+      ["Uso recomendado", "La mejor opción depende de tu prioridad: cámara, batería, gaming, trabajo o garantía."],
+      ["Conclusión", "Para una recomendación exacta según disponibilidad, solicita asesoría por WhatsApp."]
     ],
     action: {
       label: "Comparar por WhatsApp",
@@ -1054,7 +1026,7 @@ function appendComputerAdvisor(messages, text) {
       ["RAM", profile.ram],
       ["Almacenamiento", "SSD recomendado para mejor velocidad."],
       ["Pantalla/GPU", profile.display],
-      ["Siguiente paso", "Un asesor puede validar disponibilidad y cotizacion personalizada."]
+      ["Siguiente paso", "Un asesor puede validar disponibilidad y cotización personalizada."]
     ],
     action: {
       label: "Cotizar computador por WhatsApp",
@@ -1199,46 +1171,46 @@ function matches(text, terms) {
 }
 
 function detectIssue(text) {
-  const issues = ["pantalla rota", "no carga", "no enciende", "bateria", "sobrecalentamiento", "humedad", "camara", "sonido", "software", "virus", "computador lento"];
+  const issues = ["pantalla rota", "no carga", "no enciende", "batería", "sobrecalentamiento", "humedad", "cámara", "sonido", "software", "virus", "computador lento"];
   return issues.find((issue) => text.includes(normalizeChatText(issue))) || null;
 }
 
 function getPossibleCauses(text) {
-  if (matches(text, ["agua", "humedad", "liquido", "mojo"])) return ["humedad interna", "corrosion", "posible daño en placa"];
-  if (matches(text, ["pantalla", "display", "touch", "golpe"])) return ["display afectado", "tactil dañado", "conector interno flojo"];
-  if (matches(text, ["no carga", "cargador", "puerto"])) return ["puerto de carga", "cable o cargador", "bateria o flex de carga"];
-  if (matches(text, ["no enciende", "no prende"])) return ["bateria descargada o deteriorada", "software", "posible falla de placa"];
-  if (matches(text, ["bateria", "descarga"])) return ["bateria degradada", "consumo por apps", "cargador no compatible"];
-  if (matches(text, ["camara"])) return ["lente sucio", "modulo de camara", "software de camara"];
-  if (matches(text, ["sonido", "audio"])) return ["altavoz", "microfono", "configuracion o humedad"];
-  if (matches(text, ["virus", "software", "apps"])) return ["apps sospechosas", "software saturado", "configuracion insegura"];
+  if (matches(text, ["agua", "humedad", "líquido", "mojo"])) return ["humedad interna", "corrosión", "posible daño en placa"];
+  if (matches(text, ["pantalla", "display", "touch", "golpe"])) return ["display afectado", "táctil dañado", "conector interno flojo"];
+  if (matches(text, ["no carga", "cargador", "puerto"])) return ["puerto de carga", "cable o cargador", "batería o flex de carga"];
+  if (matches(text, ["no enciende", "no prende"])) return ["batería descargada o deteriorada", "software", "posible falla de placa"];
+  if (matches(text, ["batería", "descarga"])) return ["batería degradada", "consumo por apps", "cargador no compatible"];
+  if (matches(text, ["cámara"])) return ["lente sucio", "modulo de cámara", "software de cámara"];
+  if (matches(text, ["sonido", "audio"])) return ["altavoz", "micrófono", "configuración o humedad"];
+  if (matches(text, ["virus", "software", "apps"])) return ["apps sospechosas", "software saturado", "configuración insegura"];
   if (matches(text, ["lento", "computador"])) return ["almacenamiento lleno", "disco deteriorado", "RAM insuficiente"];
-  return ["requiere revision tecnica", "posible falla de software", "posible componente interno"];
+  return ["requiere revisión técnica", "posible falla de software", "posible componente interno"];
 }
 
 function getUrgency(text) {
-  if (matches(text, ["agua", "humedad", "liquido", "no enciende", "bateria inflada", "humo", "calienta mucho"])) return "Alto";
-  if (matches(text, ["pantalla", "no carga", "camara", "sonido", "virus"])) return "Medio";
+  if (matches(text, ["agua", "humedad", "líquido", "no enciende", "batería inflada", "humo", "calienta mucho"])) return "Alto";
+  if (matches(text, ["pantalla", "no carga", "cámara", "sonido", "virus"])) return "Medio";
   return "Bajo";
 }
 
 function buildDiagnosticWhatsAppMessage(causes, urgency, recommendation) {
-  return `Hola, necesito revision tecnica en DCS Technology. Dispositivo: ${chatState.deviceType || "no indicado"} ${chatState.brand || ""} ${chatState.model || ""}. Falla: ${chatState.issue || "no indicada"}. Posibles causas: ${causes.join(", ")}. Urgencia: ${urgency}. Recomendacion: ${recommendation}`;
+  return `Hola, necesito revisión técnica en DCS Technology. Dispositivo: ${chatState.deviceType || "no indicado"} ${chatState.brand || ""} ${chatState.model || ""}. Falla: ${chatState.issue || "no indicada"}. Posibles causas: ${causes.join(", ")}. Urgencia: ${urgency}. Recomendación: ${recommendation}`;
 }
 
 function buildQuoteRecommendation() {
   const range = normalizeChatText(chatState.budgetRange || "");
   const usage = normalizeChatText(chatState.usage || "");
   const preference = normalizeChatText(chatState.preference || "");
-  const level = range.includes("premium") ? "premium" : range.includes("alta") ? "gama alta" : range.includes("media") ? "gama media" : "opcion equilibrada";
+  const level = range.includes("premium") ? "premium" : range.includes("alta") ? "gama alta" : range.includes("media") ? "gama media" : "opción equilibrada";
   const useText = usage ? ` para ${chatState.usage}` : "";
   const preferenceText = preference ? ` con prioridad en ${chatState.preference}` : "";
-  return `Segun tu perfil, te conviene una ${level}${useText}${preferenceText}. La recomendacion final depende de disponibilidad, garantia y condiciones de financiacion.`;
+  return `Según tu perfil, te conviene una ${level}${useText}${preferenceText}. La recomendación final depende de disponibilidad, garantía y condiciones de financiación.`;
 }
 
 function getComputerProfile(text) {
-  if (matches(text, ["programar", "programacion"])) {
-    return { name: "programacion", cpu: "procesador moderno", ram: "16 GB RAM recomendado", display: "buena pantalla y teclado comodo" };
+  if (matches(text, ["programar", "programación"])) {
+    return { name: "programación", cpu: "procesador moderno", ram: "16 GB RAM recomendado", display: "buena pantalla y teclado cómodo" };
   }
   if (matches(text, ["diseño", "diseno", "edicion", "render"])) {
     return { name: "diseño", cpu: "procesador potente", ram: "RAM alta recomendada", display: "pantalla de buena calidad y GPU si aplica" };
@@ -1247,9 +1219,9 @@ function getComputerProfile(text) {
     return { name: "gaming", cpu: "procesador potente", ram: "RAM alta", display: "GPU dedicada y buena ventilacion" };
   }
   if (matches(text, ["estudiar", "estudio"])) {
-    return { name: "estudio", cpu: "procesador basico o intermedio", ram: "RAM suficiente para clases y tareas", display: "buena bateria y portabilidad" };
+    return { name: "estudio", cpu: "procesador básico o intermedio", ram: "RAM suficiente para clases y tareas", display: "buena batería y portabilidad" };
   }
-  return { name: "trabajo y productividad", cpu: "procesador intermedio o moderno", ram: "RAM suficiente para multitarea", display: "SSD, buena pantalla y bateria estable" };
+  return { name: "trabajo y productividad", cpu: "procesador intermedio o moderno", ram: "RAM suficiente para multitarea", display: "SSD, buena pantalla y batería estable" };
 }
 
 function scrollChatToBottom(container) {

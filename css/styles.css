@@ -686,10 +686,14 @@ h3 {
 
 .category-grid,
 .diagnosis-grid,
-.promo-fallback {
+.promo-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+}
+
+.category-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .category-card,
@@ -1603,7 +1607,7 @@ h3 {
 
   .category-grid,
   .diagnosis-grid,
-  .promo-fallback,
+  .promo-grid,
   .product-grid {
     grid-template-columns: 1fr;
   }
