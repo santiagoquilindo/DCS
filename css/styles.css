@@ -2593,13 +2593,13 @@ h3 {
   .phone-stage {
     place-items: start center;
     transform:
-      translate3d(calc(36vw + var(--phone-shift-x)), calc(var(--phone-shift-y) + var(--phone-parallax-y) + 34px), 80px)
+      translate3d(calc(39vw + var(--phone-shift-x)), calc(var(--phone-shift-y) + var(--phone-parallax-y) + 18px), 80px)
       scale(var(--phone-scale));
   }
 
   .floating-phone {
-    width: clamp(300px, 78vw, 430px);
-    opacity: 0.46;
+    width: clamp(360px, 94vw, 500px);
+    opacity: 0.34;
   }
 
   .phone-media {
@@ -3028,13 +3028,13 @@ h3 {
 
   .phone-stage {
     transform:
-      translate3d(calc(43vw + var(--phone-shift-x)), calc(var(--phone-shift-y) + var(--phone-parallax-y) + 42px), 70px)
+      translate3d(calc(46vw + var(--phone-shift-x)), calc(var(--phone-shift-y) + var(--phone-parallax-y) + 24px), 70px)
       scale(var(--phone-scale));
   }
 
   .floating-phone {
-    width: clamp(260px, 82vw, 360px);
-    opacity: 0.38;
+    width: clamp(320px, 98vw, 430px);
+    opacity: 0.31;
   }
 
   .light-rings {

@@ -10,48 +10,48 @@ const heroSlides = [
     category: "Celulares premium",
     title: "Tecnología móvil de alto nivel",
     subtitle: "Celulares modernos, potentes y listos para trabajo, estudio y entretenimiento.",
-    image: "assets/img/hero-celulares.svg",
-    fallbackImage: "assets/img/hero-celulares.svg",
+    image: "assets/img/hero-celulares-real.png",
+    fallbackImage: "assets/img/hero-celulares-real.png",
     alt: "Celulares premium disponibles en DCS Technology"
   },
   {
     category: "Diagnóstico técnico",
     title: "Revisión técnica inteligente",
     subtitle: "Detectamos posibles fallas en pantalla, batería, carga, software y rendimiento.",
-    image: "assets/img/hero-reparacion.svg",
-    fallbackImage: "assets/img/hero-reparacion.svg",
-    alt: "Servicio de diagnóstico técnico para celulares y computadores"
+    image: "assets/img/hero-revision-tecnica.png",
+    fallbackImage: "assets/img/hero-revision-tecnica.png",
+    alt: "Revisión técnica inteligente de un celular en laboratorio especializado"
   },
   {
     category: "Computadores",
     title: "Equipos para productividad y gaming",
     subtitle: "Portátiles y computadores para estudio, oficina, diseño y alto rendimiento.",
-    image: "assets/img/hero-computadores.svg",
-    fallbackImage: "assets/img/hero-computadores.svg",
+    image: "assets/img/hero-computadores-real.png",
+    fallbackImage: "assets/img/hero-computadores-real.png",
     alt: "Computadores y portátiles para productividad y gaming"
   },
   {
     category: "Accesorios",
     title: "Accesorios que completan tu experiencia",
     subtitle: "Audífonos, cargadores, fundas, cables, soportes y dispositivos inteligentes.",
-    image: "assets/img/hero-accesorios.svg",
-    fallbackImage: "assets/img/hero-accesorios.svg",
+    image: "assets/img/hero-accesorios-real.png",
+    fallbackImage: "assets/img/hero-accesorios-real.png",
     alt: "Accesorios tecnológicos para celulares y computadores"
   },
   {
     category: "Smartwatch",
     title: "Tecnología conectada a tu ritmo",
     subtitle: "Relojes inteligentes para salud, notificaciones, deporte y productividad.",
-    image: "assets/img/hero-smartwatch.svg",
-    fallbackImage: "assets/img/hero-smartwatch.svg",
+    image: "assets/img/hero-smartwatch-real.png",
+    fallbackImage: "assets/img/hero-smartwatch-real.png",
     alt: "Smartwatch y tecnología conectada"
   },
   {
     category: "Financiación",
     title: "Compra tecnología con facilidad",
     subtitle: "Opciones de financiación para estrenar equipos sin complicaciones.",
-    image: "assets/img/hero-financiacion.svg",
-    fallbackImage: "assets/img/hero-financiacion.svg",
+    image: "assets/img/hero-financiacion-real.png",
+    fallbackImage: "assets/img/hero-financiacion-real.png",
     alt: "Financiación tecnológica para productos DCS Technology"
   }
 ];
