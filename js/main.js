@@ -18,8 +18,8 @@ const heroSlides = [
     category: "Diagnóstico técnico",
     title: "Revisión técnica inteligente",
     subtitle: "Detectamos posibles fallas en pantalla, batería, carga, software y rendimiento.",
-    image: "assets/img/hero-reparación.svg",
-    fallbackImage: "assets/img/hero-reparación.svg",
+    image: "assets/img/hero-reparacion.svg",
+    fallbackImage: "assets/img/hero-reparacion.svg",
     alt: "Servicio de diagnóstico técnico para celulares y computadores"
   },
   {
@@ -50,8 +50,8 @@ const heroSlides = [
     category: "Financiación",
     title: "Compra tecnología con facilidad",
     subtitle: "Opciones de financiación para estrenar equipos sin complicaciones.",
-    image: "assets/img/hero-financiación.svg",
-    fallbackImage: "assets/img/hero-financiación.svg",
+    image: "assets/img/hero-financiacion.svg",
+    fallbackImage: "assets/img/hero-financiacion.svg",
     alt: "Financiación tecnológica para productos DCS Technology"
   }
 ];
@@ -60,7 +60,7 @@ const products = [
   {
     name: "iPhone 15 Pro",
     category: "Celulares",
-    price: "$3.999.000",
+    price: "Cotización personalizada",
     image: "assets/img/product-phone.svg",
     fallbackImage: "assets/img/product-phone.svg",
     description: "Equipo premium para fotografía, video y alto rendimiento diario."
@@ -68,7 +68,7 @@ const products = [
   {
     name: "Samsung Galaxy S24 FE",
     category: "Celulares",
-    price: "$2.499.000",
+    price: "Consultar disponibilidad",
     image: "assets/img/product-samsung.svg",
     fallbackImage: "assets/img/product-samsung.svg",
     description: "Gama alta equilibrada para productividad, fotografía y entretenimiento."
@@ -76,7 +76,7 @@ const products = [
   {
     name: "Xiaomi Redmi Note 13",
     category: "Celulares",
-    price: "$1.199.000",
+    price: "Precio sujeto a referencia",
     image: "assets/img/product-xiaomi.svg",
     fallbackImage: "assets/img/product-xiaomi.svg",
     description: "Buena autonomía y pantalla amplia para presupuesto controlado."
@@ -84,7 +84,7 @@ const products = [
   {
     name: "Galaxy Tab S9",
     category: "Tablets",
-    price: "$1.849.000",
+    price: "Cotización personalizada",
     image: "assets/img/product-tablet.svg",
     fallbackImage: "assets/img/product-tablet.svg",
     description: "Tablet para estudio, contenido, dibujo y productividad móvil."
@@ -92,7 +92,7 @@ const products = [
   {
     name: "MacBook Air M2",
     category: "Computadores",
-    price: "$5.299.000",
+    price: "Consultar disponibilidad",
     image: "assets/img/product-laptop.svg",
     fallbackImage: "assets/img/product-laptop.svg",
     description: "Portátil liviano para trabajo profesional, estudio y creación."
@@ -100,7 +100,7 @@ const products = [
   {
     name: "Kit cargador rápido USB-C",
     category: "Accesorios",
-    price: "$129.000",
+    price: "Precio sujeto a referencia",
     image: "assets/img/product-accessory.svg",
     fallbackImage: "assets/img/product-accessory.svg",
     description: "Cargador y cable de carga rápida para equipos compatibles."
@@ -144,6 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSmoothLinks();
   setupProducts();
   setupChatbot();
+  setupPremiumCardTilt();
   setupAnimationsSafely();
 });
 
@@ -424,9 +425,11 @@ function setupProducts() {
 
   const render = (items) => {
     grid.replaceChildren();
-    items.forEach((product) => {
+    items.forEach((product, index) => {
       const card = createProductCard(product);
+      card.style.setProperty("--stagger-index", String(index));
       grid.appendChild(card);
+      if (window.attachPremiumCardTilt) window.attachPremiumCardTilt(card);
       if (window.cinematicObserver) revealAnimatedElement(card);
     });
     emptyState.hidden = true;
@@ -453,18 +456,96 @@ function setupProducts() {
 function setupCinematicSurface() {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.body.classList.add("cinematic-ready");
-  if (reduceMotion) return;
+  const header = document.querySelector(".site-header");
+  if (reduceMotion) {
+    if (header) header.classList.toggle("is-scrolled", window.scrollY > 8);
+    return;
+  }
 
   let frameId = null;
   let pointerX = window.innerWidth / 2;
   let pointerY = window.innerHeight / 2;
   let scrollY = window.scrollY;
+  let phoneRotationY = 15;
+  const rotationStops = [
+    { id: "inicio", angle: 15 },
+    { id: "categorias", angle: 35 },
+    { id: "promociones", angle: 55 },
+    { id: "productos", angle: 80 },
+    { id: "financiacion", angle: 110 },
+    { id: "diagnostico", angle: 145 },
+    { id: "contacto", angle: 180 },
+  ];
+
+  const getRotationTarget = (currentScroll) => {
+    const stops = rotationStops
+      .map((stop) => {
+        const element = document.getElementById(stop.id);
+        return element ? { angle: stop.angle, top: element.offsetTop } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.top - b.top);
+
+    if (!stops.length || currentScroll <= stops[0].top) return 15;
+
+    for (let index = 0; index < stops.length - 1; index += 1) {
+      const current = stops[index];
+      const next = stops[index + 1];
+      if (currentScroll <= next.top) {
+        const distance = Math.max(next.top - current.top, 1);
+        const localProgress = Math.min(Math.max((currentScroll - current.top) / distance, 0), 1);
+        return current.angle + ((next.angle - current.angle) * localProgress);
+      }
+    }
+
+    return stops[stops.length - 1].angle;
+  };
 
   const paint = () => {
+    const doc = document.documentElement;
+    const maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 1);
+    const scrollProgress = Math.min(scrollY / maxScroll, 1);
+    const mobileSurface = window.matchMedia("(max-width: 760px)").matches;
+    const tabletSurface = window.matchMedia("(max-width: 1024px)").matches;
+    const depthLimit = mobileSurface ? 38 : 90;
+    const driftLimit = mobileSurface ? 16 : 36;
+    const targetPhoneRotateY = scrollProgress > 0.985 ? 180 : getRotationTarget(scrollY);
+    phoneRotationY += (targetPhoneRotateY - phoneRotationY) * 0.34;
+    const phoneRotateX = mobileSurface ? 5 + (scrollProgress * 7) : 9 + (scrollProgress * 9);
+    const phoneRotateZ = -7 + (scrollProgress * 12);
+    const phoneShiftX = Math.sin(scrollProgress * Math.PI * 1.2) * (mobileSurface ? 12 : 34);
+    const phoneShiftY = Math.cos(scrollProgress * Math.PI) * (mobileSurface ? 10 : 28);
+    const phoneScale = mobileSurface
+      ? 0.5 + (scrollProgress * 0.03)
+      : tabletSurface
+        ? 0.8 + (scrollProgress * 0.04)
+        : 1.04 + (scrollProgress * 0.06);
+    const phoneParallaxY = Math.min(scrollY * 0.055, mobileSurface ? 40 : 130) * -1;
+    const phoneShadowY = 12 + (scrollProgress * 18);
+    const phoneShadowScale = 0.84 + (scrollProgress * 0.24);
+    const phoneShadowOpacity = 0.42 + (scrollProgress * 0.18);
+    const phoneFlareOpacity = 0.2 + (scrollProgress * 0.16);
+    const phoneReflectionX = 30 + (scrollProgress * 35);
     document.documentElement.style.setProperty("--spotlight-x", `${pointerX}px`);
     document.documentElement.style.setProperty("--spotlight-y", `${pointerY}px`);
-    document.documentElement.style.setProperty("--scroll-depth", `${Math.min(scrollY * 0.055, 90)}px`);
+    document.documentElement.style.setProperty("--scroll-depth", `${Math.min(scrollY * 0.055, depthLimit)}px`);
+    document.documentElement.style.setProperty("--scroll-progress", scrollProgress.toFixed(4));
+    document.documentElement.style.setProperty("--cinema-drift", `${Math.sin(scrollProgress * Math.PI) * driftLimit}px`);
+    document.documentElement.style.setProperty("--phone-rotate-y", `${phoneRotationY.toFixed(2)}deg`);
+    document.documentElement.style.setProperty("--phone-rotate-x", `${phoneRotateX.toFixed(2)}deg`);
+    document.documentElement.style.setProperty("--phone-rotate-z", `${phoneRotateZ.toFixed(2)}deg`);
+    document.documentElement.style.setProperty("--phone-shift-x", `${phoneShiftX.toFixed(2)}px`);
+    document.documentElement.style.setProperty("--phone-shift-y", `${phoneShiftY.toFixed(2)}px`);
+    document.documentElement.style.setProperty("--phone-parallax-y", `${phoneParallaxY.toFixed(2)}px`);
+    document.documentElement.style.setProperty("--phone-scale", phoneScale.toFixed(3));
+    document.documentElement.style.setProperty("--phone-shadow-y", `${phoneShadowY.toFixed(2)}px`);
+    document.documentElement.style.setProperty("--phone-shadow-scale", phoneShadowScale.toFixed(3));
+    document.documentElement.style.setProperty("--phone-shadow-opacity", phoneShadowOpacity.toFixed(3));
+    document.documentElement.style.setProperty("--phone-flare-opacity", phoneFlareOpacity.toFixed(3));
+    document.documentElement.style.setProperty("--phone-reflection-x", `${phoneReflectionX.toFixed(2)}%`);
+    if (header) header.classList.toggle("is-scrolled", scrollY > 8);
     frameId = null;
+    if (Math.abs(targetPhoneRotateY - phoneRotationY) > 0.04) requestPaint();
   };
 
   const requestPaint = () => {
@@ -480,10 +561,64 @@ function setupCinematicSurface() {
 
   window.addEventListener("scroll", () => {
     scrollY = window.scrollY;
+    if (header) header.classList.toggle("is-scrolled", scrollY > 8);
     requestPaint();
   }, { passive: true });
 
   paint();
+}
+
+function setupPremiumCardTilt() {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) return;
+
+  const selector = ".category-card, .promo-card, .product-card, .diagnosis-grid article, .financing-list article, .financing-copy, .search-panel, .hero-carousel";
+  let frameId = null;
+  let activeCard = null;
+  let pointerEvent = null;
+
+  const resetCard = (card) => {
+    if (!card) return;
+    card.style.setProperty("--tilt-x", "0deg");
+    card.style.setProperty("--tilt-y", "0deg");
+    card.style.setProperty("--glow-x", "50%");
+    card.style.setProperty("--glow-y", "0%");
+  };
+
+  const paintTilt = () => {
+    if (!activeCard || !pointerEvent) {
+      frameId = null;
+      return;
+    }
+    const rect = activeCard.getBoundingClientRect();
+    const x = (pointerEvent.clientX - rect.left) / rect.width;
+    const y = (pointerEvent.clientY - rect.top) / rect.height;
+    const tiltY = (x - 0.5) * 5;
+    const tiltX = (0.5 - y) * 4;
+    activeCard.style.setProperty("--tilt-x", `${tiltX.toFixed(2)}deg`);
+    activeCard.style.setProperty("--tilt-y", `${tiltY.toFixed(2)}deg`);
+    activeCard.style.setProperty("--glow-x", `${(x * 100).toFixed(1)}%`);
+    activeCard.style.setProperty("--glow-y", `${(y * 100).toFixed(1)}%`);
+    frameId = null;
+  };
+
+  const attachTilt = (card) => {
+    if (!card || card.dataset.tiltReady === "true") return;
+    card.dataset.tiltReady = "true";
+    resetCard(card);
+    card.addEventListener("pointermove", (event) => {
+      activeCard = card;
+      pointerEvent = event;
+      if (!frameId) frameId = window.requestAnimationFrame(paintTilt);
+    }, { passive: true });
+    card.addEventListener("pointerleave", () => {
+      resetCard(card);
+      if (activeCard === card) activeCard = null;
+    }, { passive: true });
+  };
+
+  window.attachPremiumCardTilt = attachTilt;
+  document.querySelectorAll(selector).forEach(attachTilt);
 }
 
 function createProductCard(product) {
@@ -589,7 +724,19 @@ function setupAnimationsSafely() {
     threshold: 0.12
   });
 
-  elements.forEach((element) => window.cinematicObserver.observe(element));
+  const staggerGroups = [".category-grid", ".promo-grid", ".product-grid", ".diagnosis-grid", ".financing-list"];
+  staggerGroups.forEach((selector) => {
+    document.querySelectorAll(`${selector} > *`).forEach((element, index) => {
+      element.style.setProperty("--stagger-index", String(index));
+    });
+  });
+
+  elements.forEach((element, index) => {
+    if (!element.style.getPropertyValue("--stagger-index")) {
+      element.style.setProperty("--stagger-index", String(Math.min(index % 4, 3)));
+    }
+    window.cinematicObserver.observe(element);
+  });
   window.setTimeout(() => {
     elements.forEach((element) => element.classList.add("is-visible"));
   }, 1200);

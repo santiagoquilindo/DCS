@@ -25,6 +25,26 @@
   <script src="js/main.js" defer></script>
 </head>
 <body>
+  <div class="background-scene" aria-hidden="true">
+    <div class="scene-layer scene-depth"></div>
+    <div class="scene-layer scene-halos"></div>
+    <div class="scene-layer scene-grid"></div>
+    <div class="scene-layer scene-particles"></div>
+    <div class="phone-stage">
+      <div class="floating-phone">
+        <div class="phone-shadow"></div>
+        <img class="phone-media" src="assets/img/phone-3d.png" data-fallback="assets/img/phone-3d.png" alt="" width="1536" height="1024" decoding="async" fetchpriority="high">
+        <span class="phone-reflection"></span>
+        <span class="phone-flare"></span>
+        <div class="light-rings">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <header class="site-header">
     <nav class="nav" aria-label="Navegación principal">
       <a class="brand" href="#inicio" aria-label="Ir al inicio de DCS Technology">
@@ -177,8 +197,8 @@
 
     <section class="section diagnosis" id="diagnostico" aria-labelledby="diagnosticoTitle">
       <div class="section-heading" data-animate>
-        <p class="eyebrow">Chatbot local</p>
-        <h2 id="diagnosticoTitle">Diagnóstico técnico inicial sin backend</h2>
+        <p class="eyebrow">Chatbot</p>
+        <h2 id="diagnosticoTitle">Diagnóstico técnico inicial</h2>
         <p>El asistente responde en tu navegador. No envía mensajes a servidores externos ni entrega diagnósticos definitivos.</p>
       </div>
       <div class="diagnosis-grid">
