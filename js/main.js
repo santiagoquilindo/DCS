@@ -204,7 +204,6 @@ function setupHeroCarousel() {
 
   let activeIndex = 0;
   let timerId = null;
-  let progressId = null;
   let isPaused = false;
 
   const setActiveSlide = (index, options = {}) => {
@@ -232,8 +231,6 @@ function setupHeroCarousel() {
   const stopAutoplay = () => {
     if (timerId) window.clearInterval(timerId);
     timerId = null;
-    if (progressId) window.clearTimeout(progressId);
-    progressId = null;
     progress.style.transition = "none";
   };
 
@@ -290,6 +287,14 @@ function setupHeroCarousel() {
       event.preventDefault();
       setActiveSlide(activeIndex - 1);
     }
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopAutoplay();
+      return;
+    }
+    startAutoplay();
   });
 
   hero.addEventListener("pointermove", (event) => {
@@ -372,12 +377,12 @@ function configureHeroImage(image, slide) {
 
 function restartProgress(progress, reduceMotion) {
   progress.style.transition = "none";
-  progress.style.width = reduceMotion ? "100%" : "0";
+  progress.style.transform = reduceMotion ? "scaleX(1)" : "scaleX(0)";
   if (reduceMotion) return;
   window.requestAnimationFrame(() => {
     window.requestAnimationFrame(() => {
-      progress.style.transition = `width ${HERO_AUTOPLAY_MS}ms linear`;
-      progress.style.width = "100%";
+      progress.style.transition = `transform ${HERO_AUTOPLAY_MS}ms linear`;
+      progress.style.transform = "scaleX(1)";
     });
   });
 }
@@ -387,20 +392,30 @@ function setupMobileMenu() {
   const menu = document.getElementById("mainMenu");
   if (!toggle || !menu) return;
 
+  const closeMenu = () => {
+    menu.classList.remove("is-open");
+    document.body.classList.remove("menu-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Abrir menú");
+  };
+
   toggle.addEventListener("click", () => {
     const isOpen = menu.classList.toggle("is-open");
     document.body.classList.toggle("menu-open", isOpen);
     toggle.setAttribute("aria-expanded", String(isOpen));
-    toggle.setAttribute("aria-label", isOpen ? "Cerrar menu" : "Abrir menu");
+    toggle.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
   });
 
   menu.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      menu.classList.remove("is-open");
-      document.body.classList.remove("menu-open");
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "Abrir menu");
-    });
+    link.addEventListener("click", closeMenu);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 760) closeMenu();
   });
 }
 
@@ -467,6 +482,8 @@ function setupCinematicSurface() {
   let pointerY = window.innerHeight / 2;
   let scrollY = window.scrollY;
   let phoneRotationY = 15;
+  const mobileSurfaceQuery = window.matchMedia("(max-width: 760px)");
+  const tabletSurfaceQuery = window.matchMedia("(max-width: 1024px)");
   const rotationStops = [
     { id: "inicio", angle: 15 },
     { id: "categorias", angle: 35 },
@@ -505,8 +522,8 @@ function setupCinematicSurface() {
     const doc = document.documentElement;
     const maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 1);
     const scrollProgress = Math.min(scrollY / maxScroll, 1);
-    const mobileSurface = window.matchMedia("(max-width: 760px)").matches;
-    const tabletSurface = window.matchMedia("(max-width: 1024px)").matches;
+    const mobileSurface = mobileSurfaceQuery.matches;
+    const tabletSurface = tabletSurfaceQuery.matches;
     const depthLimit = mobileSurface ? 38 : 90;
     const driftLimit = mobileSurface ? 16 : 36;
     const targetPhoneRotateY = scrollProgress > 0.985 ? 180 : getRotationTarget(scrollY);
@@ -700,6 +717,7 @@ function addSystemNotice(text) {
   }
   panel.hidden = false;
   toggle.setAttribute("aria-expanded", "true");
+  toggle.setAttribute("aria-label", "Cerrar chatbot");
   appendMessage(messages, text, "bot");
 }
 
@@ -1132,7 +1150,7 @@ function appendWaterDamageResponse(messages) {
 
 function appendFinancingResponse(messages) {
   appendBotCard(messages, {
-    title: "Financiacion",
+    title: "Financiación",
     lines: [
       "La financiación depende del perfil, validación de cupo, documento requerido y condiciones del producto.",
       "La aprobación está sujeta a validación; no puedo prometer aprobación ni cuotas exactas."
@@ -1146,7 +1164,7 @@ function appendFinancingResponse(messages) {
 
 function appendComparisonResponse(messages, clean) {
   appendBotCard(messages, {
-    title: "Comparacion de equipos",
+    title: "Comparación de equipos",
     rows: [
       ["Rendimiento", "Depende del procesador, memoria, optimización y uso principal."],
       ["Cámara", "Conviene revisar estabilización, sensor, video y fotos nocturnas."],
@@ -1363,7 +1381,7 @@ function getComputerProfile(text) {
     return { name: "diseño", cpu: "procesador potente", ram: "RAM alta recomendada", display: "pantalla de buena calidad y GPU si aplica" };
   }
   if (matches(text, ["gaming", "juegos"])) {
-    return { name: "gaming", cpu: "procesador potente", ram: "RAM alta", display: "GPU dedicada y buena ventilacion" };
+    return { name: "gaming", cpu: "procesador potente", ram: "RAM alta", display: "GPU dedicada y buena ventilación" };
   }
   if (matches(text, ["estudiar", "estudio"])) {
     return { name: "estudio", cpu: "procesador básico o intermedio", ram: "RAM suficiente para clases y tareas", display: "buena batería y portabilidad" };

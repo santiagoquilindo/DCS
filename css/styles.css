@@ -48,6 +48,8 @@
 html {
   width: 100%;
   max-width: 100%;
+  overflow-x: hidden;
+  scroll-padding-top: 84px;
   scroll-behavior: smooth;
 }
 
@@ -76,6 +78,7 @@ body {
   max-width: 100%;
   min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--white);
   background: var(--bg-deep);
@@ -277,214 +280,11 @@ body > .site-footer {
   opacity: var(--phone-flare-opacity);
 }
 
-.phone-body,
-.phone-face,
-.phone-rim,
-.phone-highlight,
-.phone-side,
 .phone-shadow,
 .light-rings {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-}
-
-.phone-body {
-  border-radius: 38px;
-  transform-style: preserve-3d;
-}
-
-.phone-face {
-  border-radius: 38px;
-  overflow: hidden;
-  backface-visibility: hidden;
-  border: 1px solid rgba(174, 226, 255, 0.34);
-  box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.05),
-    inset 0 24px 60px rgba(255, 255, 255, 0.08),
-    0 34px 90px rgba(0, 0, 0, 0.56),
-    0 0 64px rgba(8, 120, 255, 0.34);
-}
-
-.phone-front {
-  background:
-    radial-gradient(circle at 50% 4%, rgba(255, 255, 255, 0.2), transparent 18%),
-    linear-gradient(142deg, rgba(93, 155, 255, 0.28), transparent 22% 36%, rgba(2, 7, 16, 0.94) 58%),
-    linear-gradient(180deg, #162848, #050b17 42%, #02050c);
-  transform: translateZ(calc(var(--phone-depth) / 2));
-}
-
-.phone-front::before {
-  content: "";
-  position: absolute;
-  inset: 9px;
-  border-radius: 30px;
-  background:
-    linear-gradient(132deg, rgba(255, 255, 255, 0.14), transparent 19% 70%, rgba(67, 162, 255, 0.12)),
-    radial-gradient(circle at 54% 70%, rgba(8, 120, 255, 0.22), transparent 32%),
-    rgba(1, 5, 14, 0.86);
-  border: 1px solid rgba(127, 216, 255, 0.16);
-}
-
-.phone-front::after {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  border-radius: 28px;
-  background:
-    linear-gradient(110deg, transparent 0 36%, rgba(255, 255, 255, 0.18) 43%, transparent 50% 100%),
-    repeating-linear-gradient(0deg, rgba(127, 216, 255, 0.035) 0 1px, transparent 1px 32px);
-  opacity: 0.56;
-}
-
-.phone-back {
-  background:
-    radial-gradient(circle at 70% 12%, rgba(127, 216, 255, 0.22), transparent 20%),
-    linear-gradient(128deg, rgba(44, 88, 156, 0.96), #07142b 35%, #01040b 78%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.16), transparent);
-  transform: rotateY(180deg) translateZ(calc(var(--phone-depth) / 2));
-}
-
-.phone-back::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.2), transparent 22% 74%, rgba(67, 162, 255, 0.2)),
-    radial-gradient(circle at 24% 70%, rgba(8, 120, 255, 0.18), transparent 34%);
-  opacity: 0.78;
-}
-
-.phone-rim {
-  border-radius: 38px;
-  transform: translateZ(calc(var(--phone-depth) / 2 + 2px));
-  box-shadow:
-    inset 0 0 0 3px rgba(174, 226, 255, 0.26),
-    inset 0 0 24px rgba(67, 162, 255, 0.16),
-    0 0 26px rgba(127, 216, 255, 0.18);
-}
-
-.phone-highlight {
-  border-radius: 38px;
-  transform: translateZ(calc(var(--phone-depth) / 2 + 4px));
-  background:
-    linear-gradient(110deg, transparent 0 35%, rgba(255, 255, 255, 0.32) 44%, transparent 55% 100%);
-  mix-blend-mode: screen;
-  opacity: 0.46;
-}
-
-.phone-side {
-  border-radius: 16px;
-  background:
-    linear-gradient(90deg, rgba(174, 226, 255, 0.34), rgba(5, 15, 32, 0.96) 36%, rgba(0, 3, 10, 1));
-  box-shadow: inset 0 0 18px rgba(127, 216, 255, 0.16);
-}
-
-.phone-side-left,
-.phone-side-right {
-  width: var(--phone-depth);
-  left: 50%;
-  margin-left: calc(var(--phone-depth) / -2);
-  transform-origin: center;
-}
-
-.phone-side-left {
-  transform: translateX(calc(-50% - 50%)) rotateY(90deg);
-}
-
-.phone-side-right {
-  transform: translateX(calc(50% + 50%)) rotateY(90deg);
-}
-
-.phone-side-top,
-.phone-side-bottom {
-  height: var(--phone-depth);
-  top: 50%;
-  margin-top: calc(var(--phone-depth) / -2);
-  transform-origin: center;
-}
-
-.phone-side-top {
-  transform: translateY(calc(-50% - 50%)) rotateX(90deg);
-}
-
-.phone-side-bottom {
-  transform: translateY(calc(50% + 50%)) rotateX(90deg);
-}
-
-.phone-notch {
-  position: absolute;
-  left: 50%;
-  top: 18px;
-  z-index: 4;
-  width: 34%;
-  height: 22px;
-  border-radius: 999px;
-  background: rgba(1, 4, 10, 0.92);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transform: translateX(-50%) translateZ(7px);
-}
-
-.phone-screen-glow {
-  position: absolute;
-  inset: 20% 13% 16%;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at 50% 30%, rgba(67, 162, 255, 0.32), transparent 42%),
-    linear-gradient(180deg, transparent, rgba(8, 120, 255, 0.12));
-  filter: blur(10px);
-  opacity: 0.72;
-  transform: translateZ(8px);
-}
-
-.phone-app {
-  position: absolute;
-  bottom: 28px;
-  z-index: 5;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(67, 162, 255, 0.9), rgba(8, 120, 255, 0.62));
-  box-shadow: 0 8px 20px rgba(8, 120, 255, 0.28);
-  transform: translateZ(10px);
-}
-
-.app-one { left: 26%; }
-.app-two { left: 44%; background: linear-gradient(135deg, rgba(33, 199, 104, 0.92), rgba(67, 162, 255, 0.46)); }
-.app-three { left: 62%; background: linear-gradient(135deg, rgba(247, 251, 255, 0.76), rgba(67, 162, 255, 0.64)); }
-
-.camera,
-.flash {
-  position: absolute;
-  z-index: 4;
-  border-radius: 50%;
-  transform: translateZ(10px);
-}
-
-.camera {
-  width: 52px;
-  height: 52px;
-  left: 28px;
-  background:
-    radial-gradient(circle at 50% 50%, #01040b 0 24%, rgba(67, 162, 255, 0.48) 25% 36%, #08172d 37% 56%, rgba(174, 226, 255, 0.42) 57% 62%, #020710 63%);
-  border: 2px solid rgba(174, 226, 255, 0.22);
-  box-shadow:
-    0 10px 18px rgba(0, 0, 0, 0.32),
-    0 0 18px rgba(67, 162, 255, 0.22);
-}
-
-.camera-one { top: 28px; }
-.camera-two { top: 88px; }
-.camera-three { top: 58px; left: 88px; }
-
-.flash {
-  top: 32px;
-  left: 98px;
-  width: 22px;
-  height: 22px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.92), rgba(127, 216, 255, 0.28) 62%, transparent 70%);
-  box-shadow: 0 0 20px rgba(127, 216, 255, 0.5);
 }
 
 .phone-shadow {
@@ -1070,11 +870,12 @@ h3 {
 
 .hero-progress span {
   display: block;
-  width: 0;
+  width: 100%;
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--blue), var(--blue-soft));
   transform-origin: left center;
+  transform: scaleX(0);
 }
 
 .section {
@@ -1300,15 +1101,6 @@ h3 {
 
 .promo-card h3 {
   margin-top: 22px;
-}
-
-.swiper {
-  width: 100%;
-  padding-bottom: 44px;
-}
-
-.swiper-pagination-bullet {
-  background: var(--blue-soft);
 }
 
 .search-panel {
@@ -2608,55 +2400,6 @@ h3 {
       drop-shadow(0 0 26px rgba(8, 120, 255, 0.24));
   }
 
-  .phone-face {
-    border-radius: 28px;
-  }
-
-  .phone-body,
-  .phone-rim,
-  .phone-highlight {
-    border-radius: 28px;
-  }
-
-  .phone-front::before {
-    inset: 7px;
-    border-radius: 23px;
-  }
-
-  .phone-front::after {
-    inset: 9px;
-    border-radius: 21px;
-  }
-
-  .camera {
-    width: 36px;
-    height: 36px;
-    left: 20px;
-  }
-
-  .camera-one { top: 20px; }
-  .camera-two { top: 62px; }
-  .camera-three { top: 41px; left: 61px; }
-
-  .flash {
-    top: 22px;
-    left: 70px;
-    width: 16px;
-    height: 16px;
-  }
-
-  .phone-notch {
-    top: 13px;
-    height: 16px;
-  }
-
-  .phone-app {
-    bottom: 20px;
-    width: 25px;
-    height: 25px;
-    border-radius: 8px;
-  }
-
   html::before {
     inset: -10%;
     opacity: 0.48;
@@ -2713,6 +2456,8 @@ h3 {
       rgba(3, 5, 10, 0.98);
     box-shadow: 0 22px 54px rgba(0, 0, 0, 0.42);
     backdrop-filter: blur(18px);
+    max-height: calc(100vh - 66px);
+    overflow-y: auto;
   }
 
   .nav-menu.is-open {
