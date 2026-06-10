@@ -205,6 +205,7 @@ function setupHeroCarousel() {
   let activeIndex = 0;
   let timerId = null;
   let isPaused = false;
+  let isHeroVisible = true;
 
   const setActiveSlide = (index, options = {}) => {
     const nextIndex = (index + heroSlides.length) % heroSlides.length;
@@ -235,7 +236,7 @@ function setupHeroCarousel() {
   };
 
   const startAutoplay = () => {
-    if (reduceMotion || timerId || isPaused) return;
+    if (reduceMotion || timerId || isPaused || !isHeroVisible || document.hidden) return;
     restartProgress(progress, false);
     timerId = window.setInterval(() => {
       setActiveSlide(activeIndex + 1);
@@ -296,6 +297,18 @@ function setupHeroCarousel() {
     }
     startAutoplay();
   });
+
+  if ("IntersectionObserver" in window) {
+    const heroAutoplayObserver = new IntersectionObserver((entries) => {
+      isHeroVisible = entries.some((entry) => entry.isIntersecting);
+      if (isHeroVisible) {
+        startAutoplay();
+        return;
+      }
+      stopAutoplay();
+    }, { threshold: 0.2 });
+    heroAutoplayObserver.observe(hero);
+  }
 
   hero.addEventListener("pointermove", (event) => {
     if (reduceMotion) return;
@@ -472,6 +485,8 @@ function setupCinematicSurface() {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.body.classList.add("cinematic-ready");
   const header = document.querySelector(".site-header");
+  const phoneStage = document.querySelector(".phone-stage");
+  const floatingPhone = document.querySelector(".floating-phone");
   const mobileSurfaceQuery = window.matchMedia("(max-width: 760px)");
   const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
   if (reduceMotion) {
@@ -505,14 +520,23 @@ function setupCinematicSurface() {
     { id: "contacto", angle: 180 },
   ];
 
-  const getRotationTarget = (currentScroll) => {
-    const stops = rotationStops
+  let cachedStops = [];
+  let maxScroll = 1;
+
+  const refreshScrollMetrics = () => {
+    cachedStops = rotationStops
       .map((stop) => {
         const element = document.getElementById(stop.id);
         return element ? { angle: stop.angle, top: element.offsetTop } : null;
       })
       .filter(Boolean)
       .sort((a, b) => a.top - b.top);
+    const doc = document.documentElement;
+    maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 1);
+  };
+
+  const getRotationTarget = (currentScroll) => {
+    const stops = cachedStops;
 
     if (!stops.length || currentScroll <= stops[0].top) return 15;
 
@@ -530,8 +554,6 @@ function setupCinematicSurface() {
   };
 
   const paint = () => {
-    const doc = document.documentElement;
-    const maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 1);
     const scrollProgress = Math.min(scrollY / maxScroll, 1);
     const mobileSurface = mobileSurfaceQuery.matches;
     const tabletSurface = tabletSurfaceQuery.matches;
@@ -565,8 +587,17 @@ function setupCinematicSurface() {
     rootStyle.setProperty("--phone-flare-opacity", phoneFlareOpacity.toFixed(3));
     rootStyle.setProperty("--phone-reflection-x", `${phoneReflectionX.toFixed(2)}%`);
     if (header) header.classList.toggle("is-scrolled", scrollY > 8);
+    if (phoneStage) phoneStage.classList.add("is-scroll-active");
+    if (floatingPhone) floatingPhone.classList.add("is-scroll-active");
     frameId = null;
-    if (Math.abs(targetPhoneRotateY - phoneRotationY) > 0.04) requestPaint();
+    if (Math.abs(targetPhoneRotateY - phoneRotationY) > 0.04) {
+      requestPaint();
+    } else {
+      window.setTimeout(() => {
+        if (phoneStage) phoneStage.classList.remove("is-scroll-active");
+        if (floatingPhone) floatingPhone.classList.remove("is-scroll-active");
+      }, 160);
+    }
   };
 
   const requestPaint = () => {
@@ -585,6 +616,17 @@ function setupCinematicSurface() {
     requestPaint();
   }, { passive: true });
 
+  window.addEventListener("resize", () => {
+    refreshScrollMetrics();
+    scrollY = window.scrollY;
+    requestPaint();
+  }, { passive: true });
+  window.addEventListener("load", () => {
+    refreshScrollMetrics();
+    requestPaint();
+  }, { once: true });
+
+  refreshScrollMetrics();
   paint();
 }
 
@@ -736,15 +778,17 @@ function setupAnimationsSafely() {
     return;
   }
 
+  document.body.classList.add("cinematic-observer-ready");
   window.cinematicObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
       entry.target.classList.add("is-visible");
+      entry.target.classList.remove("is-observed");
       observer.unobserve(entry.target);
     });
   }, {
-    rootMargin: "0px 0px -12% 0px",
-    threshold: 0.12
+    rootMargin: "0px 0px 12% 0px",
+    threshold: 0.04
   });
 
   const staggerGroups = [".category-grid", ".promo-grid", ".product-grid", ".diagnosis-grid", ".financing-list"];
@@ -758,11 +802,15 @@ function setupAnimationsSafely() {
     if (!element.style.getPropertyValue("--stagger-index")) {
       element.style.setProperty("--stagger-index", String(Math.min(index % 4, 3)));
     }
+    element.classList.add("is-observed");
     window.cinematicObserver.observe(element);
   });
   window.setTimeout(() => {
-    elements.forEach((element) => element.classList.add("is-visible"));
-  }, 1200);
+    elements.forEach((element) => {
+      element.classList.add("is-visible");
+      element.classList.remove("is-observed");
+    });
+  }, 900);
 }
 
 function revealAnimatedElement(element) {
@@ -772,6 +820,7 @@ function revealAnimatedElement(element) {
     element.classList.add("is-visible");
     return;
   }
+  element.classList.add("is-observed");
   window.cinematicObserver.observe(element);
 }
 
