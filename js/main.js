@@ -61,7 +61,7 @@ const products = [
     name: "iPhone 15 Pro",
     category: "Celulares",
     price: "Cotización personalizada",
-    image: "assets/img/product-phone.svg",
+    image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=900&q=70",
     fallbackImage: "assets/img/product-phone.svg",
     description: "Equipo premium para fotografía, video y alto rendimiento diario."
   },
@@ -69,7 +69,7 @@ const products = [
     name: "Samsung Galaxy S24 FE",
     category: "Celulares",
     price: "Consultar disponibilidad",
-    image: "assets/img/product-samsung.svg",
+    image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=900&q=70",
     fallbackImage: "assets/img/product-samsung.svg",
     description: "Gama alta equilibrada para productividad, fotografía y entretenimiento."
   },
@@ -77,7 +77,7 @@ const products = [
     name: "Xiaomi Redmi Note 13",
     category: "Celulares",
     price: "Precio sujeto a referencia",
-    image: "assets/img/product-xiaomi.svg",
+    image: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=900&q=70",
     fallbackImage: "assets/img/product-xiaomi.svg",
     description: "Buena autonomía y pantalla amplia para presupuesto controlado."
   },
@@ -85,7 +85,7 @@ const products = [
     name: "Galaxy Tab S9",
     category: "Tablets",
     price: "Cotización personalizada",
-    image: "assets/img/product-tablet.svg",
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=900&q=70",
     fallbackImage: "assets/img/product-tablet.svg",
     description: "Tablet para estudio, contenido, dibujo y productividad móvil."
   },
@@ -93,7 +93,7 @@ const products = [
     name: "MacBook Air M2",
     category: "Computadores",
     price: "Consultar disponibilidad",
-    image: "assets/img/product-laptop.svg",
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=70",
     fallbackImage: "assets/img/product-laptop.svg",
     description: "Portátil liviano para trabajo profesional, estudio y creación."
   },
@@ -101,7 +101,7 @@ const products = [
     name: "Kit cargador rápido USB-C",
     category: "Accesorios",
     price: "Precio sujeto a referencia",
-    image: "assets/img/product-accessory.svg",
+    image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=900&q=70",
     fallbackImage: "assets/img/product-accessory.svg",
     description: "Cargador y cable de carga rápida para equipos compatibles."
   }
