@@ -929,9 +929,9 @@ function classifyIntent(text) {
   if (matches(text, ["financiación", "financiar", "cuotas", "crédito", "addi", "sistecrédito", "nequi", "daviplata", "pagar por partes"])) return "financiación";
   if (matches(text, [" vs ", "versus", "comparar", "qué es mejor", "iphone o android"])) return "comparación";
   if (matches(text, ["portátil", "computador", "pc", "laptop", "programar", "diseño", "gaming", "computador lento"])) return "computador";
+  if (matches(text, ["diagnóstico", "pantalla", "no carga", "no enciende", "batería", "sobrecalienta", "cámara", "sonido", "software", "virus", "apps sospechosas", "falla", "daño", "reparación"])) return "diagnóstico";
   if (matches(text, ["cargador", "cable", "audífono", "audífonos", "smartwatch", "adaptador", "funda", "protector", "accesorio"])) return "accesorio";
   if (matches(text, ["comprar", "cotizar", "cotización", "quiero un", "quiero una", "producto", "celular", "tablet", "smartwatch"])) return text.includes("cotiz") ? "cotización" : "compra";
-  if (matches(text, ["diagnóstico", "pantalla", "no carga", "no enciende", "batería", "sobrecalienta", "cámara", "sonido", "software", "virus", "apps sospechosas", "falla", "daño", "reparación"])) return "diagnóstico";
   if (matches(text, ["garantía", "garantía"])) return "garantía";
   return "desconocido";
 }
