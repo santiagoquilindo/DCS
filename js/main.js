@@ -924,15 +924,16 @@ function processChatMessage(messages, clean) {
 function classifyIntent(text) {
   if (matches(text, ["política", "fútbol", "clima", "religión", "farándula", "noticia", "receta", "cocina"])) return "tema ajeno";
   if (matches(text, ["hola", "buenas", "buen día", "saludos", "ayuda"])) return "saludo";
-  if (matches(text, ["cayó al agua", "se mojó", "humedad", "líquido", "lluvia", "mojado", "agua"])) return "daño por agua";
+  if (matches(text, ["cayó al agua", "cayo al agua", "se mojó", "se mojo", "humedad", "líquido", "liquido", "lluvia", "mojado", "agua"])) return "daño por agua";
   if (matches(text, ["quiero que me contacten", "necesito asesor", "agenda revisión", "agendar revisión", "estoy interesado", "contacten", "hablar por whatsapp", "whatsapp"])) return "lead";
   if (matches(text, ["financiación", "financiar", "cuotas", "crédito", "addi", "sistecrédito", "nequi", "daviplata", "pagar por partes"])) return "financiación";
   if (matches(text, [" vs ", "versus", "comparar", "qué es mejor", "iphone o android"])) return "comparación";
-  if (matches(text, ["portátil", "computador", "pc", "laptop", "programar", "diseño", "gaming", "computador lento"])) return "computador";
-  if (matches(text, ["diagnóstico", "pantalla", "no carga", "no enciende", "batería", "sobrecalienta", "cámara", "sonido", "software", "virus", "apps sospechosas", "falla", "daño", "reparación"])) return "diagnóstico";
+  if (matches(text, ["cotizar", "cotización"])) return "cotización";
   if (matches(text, ["cargador", "cable", "audífono", "audífonos", "smartwatch", "adaptador", "funda", "protector", "accesorio"])) return "accesorio";
+  if (matches(text, ["portátil", "computador", "pc", "laptop", "programar", "programación", "diseño", "gaming", "render", "computador lento"])) return "computador";
+  if (matches(text, ["diagnóstico", "pantalla", "no carga", "no enciende", "batería", "sobrecalienta", "cámara", "sonido", "software", "virus", "apps sospechosas", "falla", "daño", "reparación"])) return "diagnóstico";
   if (matches(text, ["comprar", "cotizar", "cotización", "quiero un", "quiero una", "producto", "celular", "tablet", "smartwatch"])) return text.includes("cotiz") ? "cotización" : "compra";
-  if (matches(text, ["garantía", "garantía"])) return "garantía";
+  if (matches(text, ["garantía"])) return "garantía";
   return "desconocido";
 }
 
