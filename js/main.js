@@ -61,7 +61,7 @@ const products = [
     name: "iPhone 15 Pro",
     category: "Celulares",
     price: "Cotización personalizada",
-    image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=900&q=70",
+    image: "assets/img/product-phone.svg",
     fallbackImage: "assets/img/product-phone.svg",
     description: "Equipo premium para fotografía, video y alto rendimiento diario."
   },
@@ -69,7 +69,7 @@ const products = [
     name: "Samsung Galaxy S24 FE",
     category: "Celulares",
     price: "Consultar disponibilidad",
-    image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=900&q=70",
+    image: "assets/img/product-samsung.svg",
     fallbackImage: "assets/img/product-samsung.svg",
     description: "Gama alta equilibrada para productividad, fotografía y entretenimiento."
   },
@@ -77,7 +77,7 @@ const products = [
     name: "Xiaomi Redmi Note 13",
     category: "Celulares",
     price: "Precio sujeto a referencia",
-    image: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=900&q=70",
+    image: "assets/img/product-xiaomi.svg",
     fallbackImage: "assets/img/product-xiaomi.svg",
     description: "Buena autonomía y pantalla amplia para presupuesto controlado."
   },
@@ -85,7 +85,7 @@ const products = [
     name: "Galaxy Tab S9",
     category: "Tablets",
     price: "Cotización personalizada",
-    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=900&q=70",
+    image: "assets/img/product-tablet.svg",
     fallbackImage: "assets/img/product-tablet.svg",
     description: "Tablet para estudio, contenido, dibujo y productividad móvil."
   },
@@ -93,7 +93,7 @@ const products = [
     name: "MacBook Air M2",
     category: "Computadores",
     price: "Consultar disponibilidad",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=70",
+    image: "assets/img/product-laptop.svg",
     fallbackImage: "assets/img/product-laptop.svg",
     description: "Portátil liviano para trabajo profesional, estudio y creación."
   },
@@ -101,7 +101,7 @@ const products = [
     name: "Kit cargador rápido USB-C",
     category: "Accesorios",
     price: "Precio sujeto a referencia",
-    image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=900&q=70",
+    image: "assets/img/product-accessory.svg",
     fallbackImage: "assets/img/product-accessory.svg",
     description: "Cargador y cable de carga rápida para equipos compatibles."
   }
@@ -478,10 +478,11 @@ function setupCinematicSurface() {
   }
 
   let frameId = null;
-  let pointerX = window.innerWidth / 2;
-  let pointerY = window.innerHeight / 2;
   let scrollY = window.scrollY;
   let phoneRotationY = 15;
+  const rootStyle = document.documentElement.style;
+  rootStyle.setProperty("--spotlight-x", `${window.innerWidth / 2}px`);
+  rootStyle.setProperty("--spotlight-y", `${window.innerHeight / 2}px`);
   const mobileSurfaceQuery = window.matchMedia("(max-width: 760px)");
   const tabletSurfaceQuery = window.matchMedia("(max-width: 1024px)");
   const rotationStops = [
@@ -524,8 +525,6 @@ function setupCinematicSurface() {
     const scrollProgress = Math.min(scrollY / maxScroll, 1);
     const mobileSurface = mobileSurfaceQuery.matches;
     const tabletSurface = tabletSurfaceQuery.matches;
-    const depthLimit = mobileSurface ? 38 : 90;
-    const driftLimit = mobileSurface ? 16 : 36;
     const targetPhoneRotateY = scrollProgress > 0.985 ? 180 : getRotationTarget(scrollY);
     phoneRotationY += (targetPhoneRotateY - phoneRotationY) * 0.34;
     const phoneRotateX = mobileSurface ? 5 + (scrollProgress * 7) : 9 + (scrollProgress * 9);
@@ -543,23 +542,18 @@ function setupCinematicSurface() {
     const phoneShadowOpacity = 0.42 + (scrollProgress * 0.18);
     const phoneFlareOpacity = 0.2 + (scrollProgress * 0.16);
     const phoneReflectionX = 30 + (scrollProgress * 35);
-    document.documentElement.style.setProperty("--spotlight-x", `${pointerX}px`);
-    document.documentElement.style.setProperty("--spotlight-y", `${pointerY}px`);
-    document.documentElement.style.setProperty("--scroll-depth", `${Math.min(scrollY * 0.055, depthLimit)}px`);
-    document.documentElement.style.setProperty("--scroll-progress", scrollProgress.toFixed(4));
-    document.documentElement.style.setProperty("--cinema-drift", `${Math.sin(scrollProgress * Math.PI) * driftLimit}px`);
-    document.documentElement.style.setProperty("--phone-rotate-y", `${phoneRotationY.toFixed(2)}deg`);
-    document.documentElement.style.setProperty("--phone-rotate-x", `${phoneRotateX.toFixed(2)}deg`);
-    document.documentElement.style.setProperty("--phone-rotate-z", `${phoneRotateZ.toFixed(2)}deg`);
-    document.documentElement.style.setProperty("--phone-shift-x", `${phoneShiftX.toFixed(2)}px`);
-    document.documentElement.style.setProperty("--phone-shift-y", `${phoneShiftY.toFixed(2)}px`);
-    document.documentElement.style.setProperty("--phone-parallax-y", `${phoneParallaxY.toFixed(2)}px`);
-    document.documentElement.style.setProperty("--phone-scale", phoneScale.toFixed(3));
-    document.documentElement.style.setProperty("--phone-shadow-y", `${phoneShadowY.toFixed(2)}px`);
-    document.documentElement.style.setProperty("--phone-shadow-scale", phoneShadowScale.toFixed(3));
-    document.documentElement.style.setProperty("--phone-shadow-opacity", phoneShadowOpacity.toFixed(3));
-    document.documentElement.style.setProperty("--phone-flare-opacity", phoneFlareOpacity.toFixed(3));
-    document.documentElement.style.setProperty("--phone-reflection-x", `${phoneReflectionX.toFixed(2)}%`);
+    rootStyle.setProperty("--phone-rotate-y", `${phoneRotationY.toFixed(2)}deg`);
+    rootStyle.setProperty("--phone-rotate-x", `${phoneRotateX.toFixed(2)}deg`);
+    rootStyle.setProperty("--phone-rotate-z", `${phoneRotateZ.toFixed(2)}deg`);
+    rootStyle.setProperty("--phone-shift-x", `${phoneShiftX.toFixed(2)}px`);
+    rootStyle.setProperty("--phone-shift-y", `${phoneShiftY.toFixed(2)}px`);
+    rootStyle.setProperty("--phone-parallax-y", `${phoneParallaxY.toFixed(2)}px`);
+    rootStyle.setProperty("--phone-scale", phoneScale.toFixed(3));
+    rootStyle.setProperty("--phone-shadow-y", `${phoneShadowY.toFixed(2)}px`);
+    rootStyle.setProperty("--phone-shadow-scale", phoneShadowScale.toFixed(3));
+    rootStyle.setProperty("--phone-shadow-opacity", phoneShadowOpacity.toFixed(3));
+    rootStyle.setProperty("--phone-flare-opacity", phoneFlareOpacity.toFixed(3));
+    rootStyle.setProperty("--phone-reflection-x", `${phoneReflectionX.toFixed(2)}%`);
     if (header) header.classList.toggle("is-scrolled", scrollY > 8);
     frameId = null;
     if (Math.abs(targetPhoneRotateY - phoneRotationY) > 0.04) requestPaint();
@@ -571,9 +565,8 @@ function setupCinematicSurface() {
   };
 
   window.addEventListener("pointermove", (event) => {
-    pointerX = event.clientX;
-    pointerY = event.clientY;
-    requestPaint();
+    rootStyle.setProperty("--spotlight-x", `${event.clientX}px`);
+    rootStyle.setProperty("--spotlight-y", `${event.clientY}px`);
   }, { passive: true });
 
   window.addEventListener("scroll", () => {
