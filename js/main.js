@@ -61,7 +61,7 @@ const products = [
     name: "iPhone 15 Pro",
     category: "Celulares",
     price: "Cotización personalizada",
-    image: "assets/img/product-phone.svg",
+    image: "assets/img/product-smartphone-generated.jpg",
     fallbackImage: "assets/img/product-phone.svg",
     description: "Equipo premium para fotografía, video y alto rendimiento diario."
   },
@@ -69,7 +69,7 @@ const products = [
     name: "Samsung Galaxy S24 FE",
     category: "Celulares",
     price: "Consultar disponibilidad",
-    image: "assets/img/product-samsung.svg",
+    image: "assets/img/product-smartphone-generated.jpg",
     fallbackImage: "assets/img/product-samsung.svg",
     description: "Gama alta equilibrada para productividad, fotografía y entretenimiento."
   },
@@ -77,7 +77,7 @@ const products = [
     name: "Xiaomi Redmi Note 13",
     category: "Celulares",
     price: "Precio sujeto a referencia",
-    image: "assets/img/product-xiaomi.svg",
+    image: "assets/img/product-smartphone-generated.jpg",
     fallbackImage: "assets/img/product-xiaomi.svg",
     description: "Buena autonomía y pantalla amplia para presupuesto controlado."
   },
@@ -85,7 +85,7 @@ const products = [
     name: "Galaxy Tab S9",
     category: "Tablets",
     price: "Cotización personalizada",
-    image: "assets/img/product-tablet.svg",
+    image: "assets/img/product-tablet-generated.jpg",
     fallbackImage: "assets/img/product-tablet.svg",
     description: "Tablet para estudio, contenido, dibujo y productividad móvil."
   },
@@ -93,7 +93,7 @@ const products = [
     name: "MacBook Air M2",
     category: "Computadores",
     price: "Consultar disponibilidad",
-    image: "assets/img/product-laptop.svg",
+    image: "assets/img/product-laptop-generated.jpg",
     fallbackImage: "assets/img/product-laptop.svg",
     description: "Portátil liviano para trabajo profesional, estudio y creación."
   },
@@ -101,7 +101,7 @@ const products = [
     name: "Kit cargador rápido USB-C",
     category: "Accesorios",
     price: "Precio sujeto a referencia",
-    image: "assets/img/product-accessory.svg",
+    image: "assets/img/product-accessory-generated.jpg",
     fallbackImage: "assets/img/product-accessory.svg",
     description: "Cargador y cable de carga rápida para equipos compatibles."
   }
@@ -472,8 +472,19 @@ function setupCinematicSurface() {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.body.classList.add("cinematic-ready");
   const header = document.querySelector(".site-header");
+  const mobileSurfaceQuery = window.matchMedia("(max-width: 760px)");
+  const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
   if (reduceMotion) {
     if (header) header.classList.toggle("is-scrolled", window.scrollY > 8);
+    return;
+  }
+
+  if (mobileSurfaceQuery.matches || coarsePointerQuery.matches) {
+    if (header) {
+      const updateHeader = () => header.classList.toggle("is-scrolled", window.scrollY > 8);
+      updateHeader();
+      window.addEventListener("scroll", updateHeader, { passive: true });
+    }
     return;
   }
 
@@ -483,7 +494,6 @@ function setupCinematicSurface() {
   const rootStyle = document.documentElement.style;
   rootStyle.setProperty("--spotlight-x", `${window.innerWidth / 2}px`);
   rootStyle.setProperty("--spotlight-y", `${window.innerHeight / 2}px`);
-  const mobileSurfaceQuery = window.matchMedia("(max-width: 760px)");
   const tabletSurfaceQuery = window.matchMedia("(max-width: 1024px)");
   const rotationStops = [
     { id: "inicio", angle: 15 },
@@ -581,6 +591,8 @@ function setupCinematicSurface() {
 function setupPremiumCardTilt() {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduceMotion) return;
+  const lowPrecisionPointer = window.matchMedia("(hover: none), (pointer: coarse), (max-width: 760px)").matches;
+  if (lowPrecisionPointer) return;
 
   const selector = ".category-card, .promo-card, .product-card, .diagnosis-grid article, .financing-list article, .financing-copy, .search-panel, .hero-carousel";
   let frameId = null;

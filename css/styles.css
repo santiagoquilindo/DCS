@@ -252,6 +252,10 @@ body > .site-footer {
   will-change: transform, filter;
 }
 
+.floating-phone picture {
+  display: contents;
+}
+
 .phone-reflection,
 .phone-flare {
   position: absolute;
@@ -2360,7 +2364,7 @@ h3 {
   }
 
   .background-scene {
-    opacity: 0.8;
+    opacity: 0.62;
     perspective: 1000px;
   }
 
@@ -2378,8 +2382,7 @@ h3 {
   }
 
   .scene-particles {
-    opacity: 0.44;
-    background-size: 280px 280px, 320px 320px, 300px 300px, 360px 360px, 420px 420px;
+    display: none;
   }
 
   .phone-stage {
@@ -2392,24 +2395,37 @@ h3 {
   .floating-phone {
     width: clamp(360px, 94vw, 500px);
     opacity: 0.34;
+    animation: none;
+    will-change: auto;
   }
 
   .phone-media {
-    filter:
-      drop-shadow(0 18px 30px rgba(0, 0, 0, 0.42))
-      drop-shadow(0 0 26px rgba(8, 120, 255, 0.24));
+    filter: none;
+    will-change: auto;
+  }
+
+  .phone-stage {
+    transition: none;
+    will-change: auto;
+  }
+
+  .phone-shadow,
+  .phone-reflection,
+  .phone-flare,
+  .light-rings {
+    display: none;
   }
 
   html::before {
     inset: -10%;
     opacity: 0.48;
     background-size: 540px 540px, 480px 480px, auto, auto;
-    animation-duration: 38s;
+    animation: none;
   }
 
   body::before {
     opacity: 0.9;
-    animation-duration: 28s;
+    animation: none;
   }
 
   body::after {
@@ -2455,7 +2471,7 @@ h3 {
       linear-gradient(180deg, rgba(8, 120, 255, 0.12), transparent),
       rgba(3, 5, 10, 0.98);
     box-shadow: 0 22px 54px rgba(0, 0, 0, 0.42);
-    backdrop-filter: blur(18px);
+    backdrop-filter: none;
     max-height: calc(100vh - 66px);
     overflow-y: auto;
   }
@@ -2493,7 +2509,7 @@ h3 {
   }
 
   .hero-background img {
-    animation-duration: 26s;
+    animation: none;
     filter: saturate(0.95) contrast(1.02);
   }
 
@@ -2734,7 +2750,7 @@ h3 {
   }
 
   .cinematic-ready [data-animate] {
-    filter: blur(4px);
+    filter: none;
     transform: translate3d(0, 18px, 0);
     transition-duration: 520ms;
     transition-delay: calc(var(--stagger-index, 0) * 42ms);
@@ -2745,7 +2761,7 @@ h3 {
   }
 
   .cinematic-ready .hero-content > * {
-    filter: blur(7px);
+    filter: none;
     animation-duration: 520ms;
   }
 
