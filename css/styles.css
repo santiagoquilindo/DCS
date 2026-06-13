@@ -1570,8 +1570,9 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
+  padding: 16px 16px 28px;
   overflow-y: auto;
+  scroll-padding-bottom: 28px;
 }
 
 .message {
@@ -1642,12 +1643,21 @@ h3 {
 
 .chat-whatsapp {
   align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  max-width: 100%;
   margin-top: -4px;
+  margin-bottom: 8px;
   padding: 9px 12px;
   border-radius: 8px;
   color: #04130a;
   background: var(--success);
   font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
 }
 
 .quick-replies {
@@ -1716,13 +1726,13 @@ h3 {
 
 .chatbot-form {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 10px;
   padding: 14px;
   border-top: 1px solid var(--line);
 }
 
-.chatbot-form button {
+.chatbot-form button[type="submit"] {
   border: 0;
   border-radius: 8px;
   padding: 0 14px;
@@ -1730,6 +1740,28 @@ h3 {
   background: var(--blue);
   cursor: pointer;
   font-weight: 800;
+}
+
+#clearBtn {
+  background: #64748b;
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#clearBtn:hover,
+#clearBtn:focus-visible {
+  background: #475569;
+}
+
+#clearBtn:active,
+#clearBtn.is-cleared {
+  transform: scale(0.95);
 }
 
 .cinematic-observer-ready [data-animate].is-observed {
@@ -2804,6 +2836,14 @@ h3 {
   .product-actions,
   .chatbot-form {
     grid-template-columns: 1fr;
+  }
+
+  .chatbot-form {
+    grid-template-columns: 44px 1fr;
+  }
+
+  .chatbot-form input {
+    grid-column: 1 / -1;
   }
 
   .hero-actions {

@@ -1,9 +1,100 @@
 "use strict";
 
-const WHATSAPP_NUMBER = "573178765432";
-const MAX_QUERY_LENGTH = 60;
-const MAX_CHAT_LENGTH = 220;
-const HERO_AUTOPLAY_MS = 4000;
+const CONFIG = Object.freeze({
+  WHATSAPP_NUMBER: "573178765432",
+  MAX_QUERY_LENGTH: 60,
+  MAX_CHAT_LENGTH: 500,
+  MODEL_MAX_LENGTH: 80,
+  CUSTOM_BRAND_MAX_LENGTH: 40,
+  HERO_AUTOPLAY_MS: 4000,
+  CHAT_SESSION_TIMEOUT_MS: 30 * 60 * 1000,
+  CHAT_HISTORY_LIMIT: 80,
+  maxReintentos: 3,
+  STORAGE_KEY: "dcs_chatbot_state_v1"
+});
+
+const MAX_QUERY_LENGTH = CONFIG.MAX_QUERY_LENGTH;
+const MAX_CHAT_LENGTH = CONFIG.MAX_CHAT_LENGTH;
+const HERO_AUTOPLAY_MS = CONFIG.HERO_AUTOPLAY_MS;
+
+let isRestoringChat = false;
+let restoredSessionExpired = false;
+let isChatProcessing = false;
+let clearFeedbackTimer = null;
+
+const Utils = {
+  sanitizeText(value, maxLength = 160) {
+    return String(value || "")
+      .normalize("NFKC")
+      .replace(/[<>`{}[\]\\]/g, "")
+      .replace(/[\u0000-\u001F\u007F]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, maxLength);
+  },
+  clampNumber(value, min, max) {
+    const number = Number.isFinite(value) ? value : min;
+    return Math.max(min, Math.min(max, number));
+  },
+  safeJsonParse(value, fallback) {
+    try {
+      return JSON.parse(value);
+    } catch (_error) {
+      return fallback;
+    }
+  },
+  normalizarTexto(value) {
+    return this.sanitizeText(value, CONFIG.MAX_CHAT_LENGTH)
+      .toLocaleLowerCase("es-CO")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  },
+  mejorCoincidencia(value, options = []) {
+    const source = this.normalizarTexto(value);
+    if (!source || !options.length) return { opcion: null, esValida: false };
+    let best = { opcion: null, score: Infinity };
+    options.forEach((option) => {
+      const target = this.normalizarTexto(option);
+      const score = this.textDistance(source, target);
+      if (score < best.score) best = { opcion: option, score };
+    });
+    const longest = Math.max(source.length, this.normalizarTexto(best.opcion || "").length, 1);
+    return {
+      opcion: best.opcion,
+      esValida: best.score <= 2 || best.score / longest <= 0.28
+    };
+  },
+  textDistance(a, b) {
+    const left = this.normalizarTexto(a);
+    const right = this.normalizarTexto(b);
+    const matrix = Array.from({ length: left.length + 1 }, (_, index) => [index]);
+    for (let index = 1; index <= right.length; index += 1) matrix[0][index] = index;
+    for (let row = 1; row <= left.length; row += 1) {
+      for (let col = 1; col <= right.length; col += 1) {
+        const cost = left[row - 1] === right[col - 1] ? 0 : 1;
+        matrix[row][col] = Math.min(
+          matrix[row - 1][col] + 1,
+          matrix[row][col - 1] + 1,
+          matrix[row - 1][col - 1] + cost
+        );
+      }
+    }
+    return matrix[left.length][right.length];
+  },
+  storageAvailable() {
+    try {
+      const key = "__dcs_storage_test__";
+      window.localStorage.setItem(key, "1");
+      window.localStorage.removeItem(key);
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  }
+};
 
 const heroSlides = [
   {
@@ -122,8 +213,17 @@ const chatState = {
   leadContact: null,
   flow: null,
   step: null,
-  answers: {}
+  steps: [],
+  currentStepIndex: 0,
+  answers: {},
+  answerHistory: [],
+  invalidRetries: 0,
+  lastInteractionAt: 0,
+  chatHistory: [],
+  memoria: createDiagnosticMemory()
 };
+
+const estadoGlobal = chatState;
 
 const quickActions = [
   "Diagnóstico técnico",
@@ -135,6 +235,106 @@ const quickActions = [
   "Computador ideal",
   "Hablar por WhatsApp"
 ];
+
+const KNOWN_DIAGNOSTIC_BRANDS = [
+  "xiaomi",
+  "samsung",
+  "iphone",
+  "apple",
+  "motorola",
+  "huawei",
+  "honor",
+  "oppo",
+  "vivo",
+  "realme",
+  "tecno",
+  "infinix",
+  "lg",
+  "lenovo",
+  "hp",
+  "dell",
+  "asus",
+  "acer"
+];
+
+const DIAGNOSTIC_KNOWLEDGE_BASE = {
+  no_enciende: {
+    title: "No enciende",
+    aliases: ["no enciende", "no prende", "apagado", "se apago", "murio", "no da senal"],
+    questions: [
+      { field: "evento", title: "Evento", question: "Se apagó de repente o después de una caída, golpe o contacto con agua?", options: ["Se apagó de repente", "Después de una caída o golpe", "Después de contacto con agua o humedad", "Después de actualizar o instalar algo", "No sé"] },
+      { field: "sintomas", title: "Señales", question: "Vibra, muestra logo, prende LED o no hace absolutamente nada?", options: ["No hace absolutamente nada", "Vibra pero no muestra imagen", "Se queda en el logo", "Prende LED o indicador", "No sé"] },
+      { field: "cargador", title: "Prueba de carga", question: "Probaste otro cargador y otro cable que funcionen bien?", options: ["Sí, probé otro cargador y cable", "Probé solo otro cable", "Probé solo otro cargador", "No he probado otro cargador", "No sé"] },
+      { field: "tiempo", title: "Tiempo de falla", question: "Hace cuánto ocurrió la falla?" }
+    ]
+  },
+  pantalla: {
+    title: "Pantalla rota / dañada",
+    aliases: ["pantalla", "display", "touch", "tactil", "vidrio", "linea verde", "lineas", "manchas", "negra"],
+    questions: [
+      { field: "tipoDano", title: "Tipo de daño", question: "El vidrio está roto o el display no da imagen?", options: ["Solo vidrio roto", "Display no da imagen", "Vidrio roto y display dañado", "No sé"] },
+      { field: "tactil", title: "Táctil", question: "El táctil responde correctamente?", options: ["Sí responde normal", "Responde parcialmente", "No responde", "No sé"] },
+      { field: "sintomas", title: "Imagen", question: "Tiene manchas negras, líneas verdes, parpadeo o pantalla totalmente negra?", options: ["Manchas negras", "Líneas verdes", "Parpadeo", "Pantalla totalmente negra", "No sé"] },
+      { field: "evento", title: "Origen", question: "Fue después de un golpe, caída o humedad?", options: ["Después de golpe o caída", "Después de humedad o agua", "Empezó de repente", "No sé"] },
+      { field: "tiempo", title: "Tiempo de falla", question: "Hace cuánto empezó el problema?" }
+    ]
+  },
+  no_carga: {
+    title: "No carga",
+    aliases: ["no carga", "carga lento", "carga intermitente", "puerto", "pin de carga", "cargador"],
+    questions: [
+      { field: "cargador", title: "Prueba de carga", question: "Probaste otro cargador y otro cable?", options: ["Sí, probé otro cargador y cable", "Probé solo otro cable", "Probé solo otro cargador", "No he probado otro cargador", "No sé"] },
+      { field: "puerto", title: "Puerto", question: "El puerto se siente flojo, sucio o dañado?", options: ["Puerto flojo", "Puerto sucio", "Puerto dañado", "Puerto normal", "No sé"] },
+      { field: "sintomas", title: "Carga", question: "La carga es intermitente o nunca aparece?", options: ["Carga intermitente", "Nunca aparece carga", "Carga lento", "Carga solo en cierta posición", "No sé"] },
+      { field: "temperatura", title: "Temperatura", question: "El equipo calienta al cargar?", options: ["Sí calienta mucho", "Calienta normal", "No calienta", "No sé"] },
+      { field: "iconoCarga", title: "Ícono de carga", question: "Aparece el ícono de carga cuando lo conectas?", options: ["Sí aparece el ícono", "No aparece el ícono", "Aparece y desaparece", "No sé"] },
+      { field: "tiempo", title: "Tiempo de falla", question: "Hace cuánto empezó la falla?" }
+    ]
+  },
+  bateria: {
+    title: "Batería dura poco",
+    aliases: ["bateria", "descarga", "dura poco", "se apaga", "porcentaje", "inflada"],
+    questions: [
+      { field: "duracion", title: "Duración", question: "Cuánto dura aproximadamente la batería con uso normal?" },
+      { field: "reposo", title: "Reposo", question: "Se descarga estando en reposo?", options: ["Sí, se descarga en reposo", "No se descarga en reposo", "No sé"] },
+      { field: "porcentaje", title: "Porcentaje", question: "Se apaga con porcentaje alto?", options: ["Sí, se apaga con porcentaje alto", "No, llega a 0% normal", "Se reinicia", "No sé"] },
+      { field: "bateriaInflada", title: "Estado físico", question: "La batería está inflada o la tapa/pantalla se levantó?", options: ["Batería inflada", "Tapa o pantalla levantada", "No está inflada", "No sé"] },
+      { field: "temperatura", title: "Temperatura", question: "El equipo se calienta más de lo normal?", options: ["Sí calienta mucho", "Calienta normal", "No calienta", "No sé"] },
+      { field: "tiempo", title: "Tiempo de falla", question: "Hace cuánto notas el problema?" }
+    ]
+  },
+  computador_lento: {
+    title: "Computador lento",
+    aliases: ["computador lento", "pc lento", "laptop lenta", "portatil lento", "lento", "se traba"],
+    questions: [
+      { field: "sistemaOperativo", title: "Sistema operativo", question: "Qué sistema operativo usa: Windows, macOS, Linux u otro?", options: ["Windows", "macOS", "Linux", "Otro", "No sé"] },
+      { field: "almacenamiento", title: "Disco", question: "Tiene SSD o HDD?", options: ["SSD", "HDD", "SSD y HDD", "No sé"] },
+      { field: "ram", title: "Memoria RAM", question: "Cuánta memoria RAM tiene aproximadamente?" },
+      { field: "momentoLentitud", title: "Momento", question: "Se pone lento al iniciar, al abrir programas o todo el tiempo?", options: ["Lento al iniciar", "Lento al abrir programas", "Lento todo el tiempo", "No sé"] },
+      { field: "softwareSospechoso", title: "Software", question: "Tiene virus, ventanas emergentes o programas desconocidos?", options: ["Ventanas emergentes", "Programas desconocidos", "Sospecha de virus", "No veo nada extraño", "No sé"] },
+      { field: "ruidos", title: "Ruido", question: "Hace ruidos extraños o se calienta mucho?", options: ["Hace ruidos extraños", "Se calienta mucho", "Ruidos y calentamiento", "No presenta ruidos", "No sé"] },
+      { field: "tiempo", title: "Tiempo de falla", question: "Hace cuánto empezó la lentitud?" }
+    ]
+  },
+  software: {
+    title: "Software / virus",
+    aliases: ["virus", "software", "apps", "aplicaciones", "ventanas emergentes", "publicidad"],
+    questions: [
+      { field: "sintomas", title: "Síntomas", question: "Qué notas: lentitud, publicidad, reinicios, bloqueo o apps desconocidas?", options: ["Lentitud", "Publicidad o ventanas emergentes", "Reinicios", "Apps desconocidas", "No sé"] },
+      { field: "evento", title: "Origen", question: "Instalaste alguna app, actualización o archivo antes de la falla?", options: ["Instalé una app", "Hice una actualización", "Abrí o descargué un archivo", "Empezó de repente", "No sé"] },
+      { field: "tiempo", title: "Tiempo de falla", question: "Hace cuánto ocurre?" }
+    ]
+  },
+  general: {
+    title: "Falla general",
+    aliases: [],
+    questions: [
+      { field: "evento", title: "Origen", question: "La falla empezó después de caída, golpe, humedad, actualización o de repente?", options: ["Después de caída o golpe", "Después de humedad o agua", "Después de actualización", "Empezó de repente", "No sé"] },
+      { field: "sintomas", title: "Síntomas", question: "Qué señales exactas ves o escuchas en el equipo?" },
+      { field: "tiempo", title: "Tiempo de falla", question: "Hace cuánto empezó?" }
+    ]
+  }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   setupTemporaryImageFallbacks();
@@ -149,12 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function sanitizeText(value, maxLength = 160) {
-  return String(value || "")
-    .normalize("NFKC")
-    .replace(/[<>`{}[\]\\]/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, maxLength);
+  return Utils.sanitizeText(value, maxLength);
 }
 
 function normalizeForSearch(value) {
@@ -165,7 +360,7 @@ function normalizeForSearch(value) {
 }
 
 function whatsappUrl(message) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(sanitizeText(message, 1800))}`;
 }
 
 function setupTemporaryImageFallbacks() {
@@ -830,17 +1025,31 @@ function setupChatbot() {
   const close = document.getElementById("chatbotClose");
   const form = document.getElementById("chatForm");
   const input = document.getElementById("chatInput");
+  const clearBtn = document.getElementById("clearBtn");
   const messages = document.getElementById("chatMessages");
-  if (!toggle || !panel || !close || !form || !input || !messages) return;
+  if (!toggle || !panel || !close || !form || !input || !messages || !clearBtn) return;
+  if (form.dataset.chatbotReady === "true") return;
+  form.dataset.chatbotReady = "true";
 
-  appendBotCard(messages, {
-    title: "Asistente Inteligente DCS Technology",
-    lines: [
-      "Ventas, cotización, diagnóstico preliminar, financiación y accesorios.",
-      "No doy precios exactos ni diagnósticos definitivos; un asesor puede validar la cotización."
-    ]
-  });
-  appendQuickActions(messages, quickActions);
+  restoredSessionExpired = false;
+  if (!restoreChatSession(messages)) {
+    appendBotCard(messages, {
+      title: "Asistente Inteligente DCS Technology",
+      lines: [
+        "Ventas, cotización, diagnóstico preliminar, financiación y accesorios.",
+        "No doy precios exactos ni diagnósticos definitivos; un asesor puede validar la cotización."
+      ]
+    });
+    if (restoredSessionExpired) {
+      appendBotCard(messages, {
+        title: "Sesión reiniciada",
+        lines: ["La conversación anterior venció por inactividad. Continuaré con un contexto nuevo."]
+      });
+      restoredSessionExpired = false;
+    }
+    appendQuickActions(messages, quickActions);
+    persistChatSession();
+  }
 
   toggle.addEventListener("click", () => {
     const isOpen = panel.hidden;
@@ -855,8 +1064,13 @@ function setupChatbot() {
     toggle.setAttribute("aria-label", "Abrir chatbot");
   });
 
+  clearBtn.addEventListener("click", () => {
+    clearChatInput(input, clearBtn);
+  });
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (isChatProcessing) return;
     const clean = sanitizeText(input.value, MAX_CHAT_LENGTH);
     input.value = "";
     if (!clean) {
@@ -866,21 +1080,68 @@ function setupChatbot() {
       });
       return;
     }
+    if (isClearCommand(clean)) {
+      clearChatInput(input, clearBtn, messages);
+      return;
+    }
     handleChatUserText(messages, clean);
   });
 }
 
 function handleChatUserText(messages, clean) {
+  if (isChatProcessing) return;
+  isChatProcessing = true;
+  const sessionExpired = isChatSessionExpired();
   appendMessage(messages, clean, "user");
   showTyping(messages, () => {
-    processChatMessage(messages, clean);
+    try {
+      processChatMessage(messages, clean, sessionExpired);
+    } finally {
+      isChatProcessing = false;
+    }
   });
 }
 
-function processChatMessage(messages, clean) {
+function clearChatInput(input, clearBtn, messages = null) {
+  input.value = "";
+  input.focus();
+  clearBtn.classList.add("is-cleared");
+  if (clearFeedbackTimer) window.clearTimeout(clearFeedbackTimer);
+  clearFeedbackTimer = window.setTimeout(() => {
+    clearBtn.classList.remove("is-cleared");
+    clearFeedbackTimer = null;
+  }, 180);
+  if (messages) {
+    appendBotCard(messages, {
+      title: "Campo de texto limpiado",
+      lines: ["Puedes escribir nuevamente."]
+    });
+  }
+}
+
+function isClearCommand(value) {
+  const text = Utils.normalizarTexto(value);
+  return ["/borrar", "borrar", "borrar texto", "papelera borrar"].some((command) => text === Utils.normalizarTexto(command));
+}
+
+function processChatMessage(messages, clean, sessionExpired = false) {
+  if (sessionExpired) {
+    const lastUserMessage = chatState.chatHistory.slice(-1);
+    clearChatFlow({ persist: false });
+    resetDiagnosticContext();
+    chatState.chatHistory = lastUserMessage;
+    clearStoredChatSession();
+    appendBotCard(messages, {
+      title: "Sesión reiniciada",
+      lines: ["La conversación anterior venció por inactividad. Continuaré con tu nuevo mensaje."]
+    });
+  }
+  markChatInteraction();
+
   const text = normalizeChatText(clean);
 
   if (chatState.flow) {
+    if (!recoverInvalidChatState(messages)) return;
     continueChatFlow(messages, clean, text);
     return;
   }
@@ -979,6 +1240,7 @@ function classifyIntent(text) {
   if (matches(text, [" vs ", "versus", "comparar", "qué es mejor", "iphone o android"])) return "comparación";
   if (matches(text, ["cotizar", "cotización"])) return "cotización";
   if (matches(text, ["cargador", "cable", "audífono", "audífonos", "smartwatch", "adaptador", "funda", "protector", "accesorio"])) return "accesorio";
+  if (matches(text, ["computador lento", "pc lento", "laptop lenta", "portátil lento", "portatil lento", "se traba", "está lento", "esta lento"])) return "diagnóstico";
   if (matches(text, ["portátil", "computador", "pc", "laptop", "programar", "programación", "diseño", "gaming", "render", "computador lento"])) return "computador";
   if (matches(text, ["diagnóstico", "pantalla", "no carga", "no enciende", "batería", "sobrecalienta", "cámara", "sonido", "software", "virus", "apps sospechosas", "falla", "daño", "reparación"])) return "diagnóstico";
   if (matches(text, ["comprar", "cotizar", "cotización", "quiero un", "quiero una", "producto", "celular", "tablet", "smartwatch"])) return text.includes("cotiz") ? "cotización" : "compra";
@@ -988,15 +1250,18 @@ function classifyIntent(text) {
 
 function startDiagnosticFlow(messages, initialText) {
   resetChatFlow("diagnóstico", "deviceType");
-  chatState.issue = detectIssue(normalizeChatText(initialText)) || sanitizeText(initialText, 80);
+  chatState.issue = detectIssue(normalizeChatText(initialText)) || "";
+  updateDiagnosticMemory("problema", chatState.issue || sanitizeText(initialText, 80));
+  chatState.steps = buildDiagnosticSteps(chatState.issue);
+  chatState.currentStepIndex = 0;
   appendBotCard(messages, {
     title: "Diagnóstico técnico guiado",
     lines: [
       "Haré preguntas cortas para crear un diagnóstico preliminar.",
-      "No es un diagnóstico definitivo; puede requerir revisión técnica."
+      "Puedes escribir corregir para cambiar la última respuesta."
     ]
   });
-  askFlowQuestion(messages, "Tipo de dispositivo", "¿Qué equipo deseas revisar: celular, tablet, computador o smartwatch?");
+  askCurrentDiagnosticQuestion(messages);
 }
 
 function startQuoteFlow(messages, initialText) {
@@ -1033,60 +1298,124 @@ function continueChatFlow(messages, clean, text) {
   }
   if (chatState.flow === "lead") {
     continueLeadFlow(messages, clean);
+    return;
   }
+  clearChatFlow();
+  appendBotCard(messages, {
+    title: "Necesito retomar el contexto",
+    lines: ["La conversación anterior no se pudo continuar. Escríbeme nuevamente el producto o falla que quieres revisar."]
+  });
+}
+
+function recoverInvalidChatState(messages) {
+  if (isValidChatState()) return true;
+  clearChatFlow();
+  appendBotCard(messages, {
+    title: "Conversación recuperada",
+    lines: ["Detecté un estado inválido y reinicié el contexto activo. Puedes iniciar una nueva consulta."]
+  });
+  appendQuickActions(messages, quickActions);
+  persistChatSession();
+  return false;
+}
+
+function isValidChatState() {
+  if (!chatState.flow) return true;
+  if (!["diagnóstico", "cotización", "lead"].includes(chatState.flow)) return false;
+
+  if (chatState.flow === "diagnóstico") {
+    return Array.isArray(chatState.steps)
+      && chatState.steps.length > 0
+      && chatState.currentStepIndex >= 0
+      && chatState.currentStepIndex < chatState.steps.length
+      && chatState.steps[chatState.currentStepIndex]?.field === chatState.step;
+  }
+
+  const allowedSteps = {
+    cotización: ["productType", "usage", "budgetRange", "preference"],
+    lead: ["leadName", "leadProductOrIssue", "leadCity", "leadContact"]
+  };
+  return allowedSteps[chatState.flow].includes(chatState.step);
 }
 
 function continueDiagnosticFlow(messages, clean, text) {
-  const value = sanitizeText(clean, 90);
-  if (chatState.step === "deviceType") {
-    chatState.deviceType = value;
-    chatState.step = "brand";
-    askFlowQuestion(messages, "Marca", "¿Cuál es la marca del equipo?");
+  const currentStep = chatState.steps[chatState.currentStepIndex];
+  const value = sanitizeText(clean, getStepMaxLength(currentStep));
+  if (isCorrectionRequest(text)) {
+    correctLastDiagnosticAnswer(messages);
     return;
   }
-  if (chatState.step === "brand") {
-    chatState.brand = value;
-    chatState.step = "model";
-    askFlowQuestion(messages, "Modelo", "¿Cuál es el modelo aproximado?");
+
+  if (handleDiagnosticRetryAction(messages, text)) {
     return;
   }
-  if (chatState.step === "model") {
-    chatState.model = value;
-    chatState.step = "issue";
-    askFlowQuestion(messages, "Falla principal", "¿Cuál es la falla principal?");
-    return;
-  }
-  if (chatState.step === "issue") {
-    chatState.issue = value;
-    chatState.step = "impact";
-    askFlowQuestion(messages, "Golpe o humedad", "¿Tuvo golpe, contacto con agua o humedad?");
-    return;
-  }
-  if (chatState.step === "impact") {
-    chatState.answers.impact = value;
-    chatState.step = "power";
-    askFlowQuestion(messages, "Carga y encendido", "¿El equipo carga y enciende? Responde con lo que observes.");
-    return;
-  }
-  if (chatState.step === "power") {
-    chatState.answers.power = value;
-    chatState.step = "time";
-    askFlowQuestion(messages, "Tiempo de falla", "¿Hace cuánto empezó la falla?");
-    return;
-  }
-  if (chatState.step === "time") {
-    chatState.answers.time = value;
+
+  if (!currentStep) {
     finishDiagnosticFlow(messages);
+    return;
   }
+
+  const validation = validateDiagnosticAnswer(value, getStepOptions(currentStep));
+  if (!validation.isValid) {
+    handleInvalidDiagnosticAnswer(messages, currentStep);
+    return;
+  }
+
+  chatState.invalidRetries = 0;
+  const canonicalValue = validation.canonical || value;
+  saveDiagnosticAnswer(currentStep, canonicalValue);
+
+  if (currentStep.field === "brand") {
+    if (isOtherBrand(canonicalValue)) {
+      insertDiagnosticStepAfterCurrent({
+        field: "customBrand",
+        title: "Marca exacta",
+        question: "Escribe la marca del equipo."
+      });
+    } else if (!isUnknownAnswer(canonicalValue)) {
+      updateDiagnosticMemory("marca", canonicalValue);
+      personalizeModelQuestion(canonicalValue);
+    }
+  }
+
+  if (currentStep.field === "customBrand") {
+    chatState.brand = canonicalValue;
+    updateDiagnosticMemory("marca", canonicalValue);
+    personalizeModelQuestion(canonicalValue);
+  }
+
+  if (currentStep.field === "issue") {
+    chatState.issue = canonicalValue;
+    updateDiagnosticMemory("problema", canonicalValue);
+    replacePendingIssueSteps(buildIssueSpecificSteps(canonicalValue));
+  }
+
+  if (hasCriticalBatteryWarning(canonicalValue) || hasWaterWarning(canonicalValue)) {
+    updateDiagnosticMemory("gravedad", "Alta");
+  }
+
+  chatState.currentStepIndex += 1;
+  if (chatState.currentStepIndex >= chatState.steps.length) {
+    finishDiagnosticFlow(messages);
+    return;
+  }
+  askCurrentDiagnosticQuestion(messages);
 }
 
 function finishDiagnosticFlow(messages) {
-  const issueText = normalizeChatText(`${chatState.issue} ${chatState.answers.impact} ${chatState.answers.power}`);
+  const issueText = normalizeChatText([
+    chatState.issue,
+    chatState.deviceType,
+    chatState.brand,
+    chatState.model,
+    ...Object.values(chatState.answers)
+  ].join(" "));
   const causes = getPossibleCauses(issueText);
   const urgency = getUrgency(issueText);
-  const recommendation = urgency === "Alto"
-    ? "Evita seguir usando el equipo y solicita revisión técnica cuanto antes."
-    : "Se recomienda revisión técnica para confirmar causa y cotización.";
+  const recommendation = buildDiagnosticRecommendation(issueText, urgency);
+  const confidence = calculateDiagnosticConfidence(causes, urgency);
+  updateDiagnosticMemory("gravedad", urgency);
+  updateDiagnosticMemory("confianza", confidence);
 
   appendBotCard(messages, {
     title: "Diagnóstico preliminar",
@@ -1094,12 +1423,13 @@ function finishDiagnosticFlow(messages) {
       ["Dispositivo", `${chatState.deviceType || "No indicado"} ${chatState.brand || ""} ${chatState.model || ""}`.trim()],
       ["Falla reportada", chatState.issue || "No indicada"],
       ["Posibles causas", causes.join(", ")],
-      ["Nivel de urgencia", urgency],
+      ["Gravedad", urgency],
+      ["Precisión del diagnóstico", `${confidence}/100`],
       ["Recomendación", recommendation]
     ],
     action: {
       label: "Contactar asesor por WhatsApp",
-      message: buildDiagnosticWhatsAppMessage(causes, urgency, recommendation)
+      message: buildDiagnosticWhatsAppMessage(causes, urgency, recommendation, confidence)
     }
   });
   clearChatFlow();
@@ -1269,27 +1599,187 @@ function appendAccessoryResponse(messages, clean) {
   });
 }
 
+function markChatInteraction() {
+  chatState.lastInteractionAt = Date.now();
+}
+
+function isChatSessionExpired(timestamp = chatState.lastInteractionAt) {
+  return Boolean(timestamp) && Date.now() - timestamp > CONFIG.CHAT_SESSION_TIMEOUT_MS;
+}
+
+function pushChatHistory(entry) {
+  if (isRestoringChat) return;
+  chatState.chatHistory.push(entry);
+  if (chatState.chatHistory.length > CONFIG.CHAT_HISTORY_LIMIT) {
+    chatState.chatHistory = chatState.chatHistory.slice(-CONFIG.CHAT_HISTORY_LIMIT);
+  }
+  persistChatSession();
+}
+
+function persistChatSession() {
+  if (isRestoringChat || !Utils.storageAvailable()) return;
+  try {
+    const payload = {
+      savedAt: Date.now(),
+      state: serializeChatState(),
+      history: chatState.chatHistory.slice(-CONFIG.CHAT_HISTORY_LIMIT)
+    };
+    window.localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(payload));
+  } catch (_error) {
+    try {
+      window.localStorage.removeItem(CONFIG.STORAGE_KEY);
+    } catch (_removeError) {
+      // Storage may be blocked by the browser; the chatbot still works without persistence.
+    }
+  }
+}
+
+function restoreChatSession(messages) {
+  if (!Utils.storageAvailable()) return false;
+  const raw = window.localStorage.getItem(CONFIG.STORAGE_KEY);
+  if (!raw) return false;
+
+  const payload = Utils.safeJsonParse(raw, null);
+  if (!payload || !payload.state || isChatSessionExpired(payload.state.lastInteractionAt || payload.savedAt)) {
+    restoredSessionExpired = Boolean(payload && payload.state);
+    resetDiagnosticContext();
+    clearStoredChatSession();
+    return false;
+  }
+
+  applySerializedChatState(payload.state);
+  const history = Array.isArray(payload.history) ? payload.history.slice(-CONFIG.CHAT_HISTORY_LIMIT) : [];
+  isRestoringChat = true;
+  messages.replaceChildren();
+  history.forEach((entry) => renderChatHistoryEntry(messages, entry));
+  isRestoringChat = false;
+
+  if (!history.length) return false;
+  if (chatState.flow === "diagnóstico") {
+    appendOptionReplies(messages, getStepOptions(chatState.steps[chatState.currentStepIndex]));
+  } else if (!chatState.flow) {
+    appendQuickActions(messages, quickActions);
+  }
+  scrollChatToBottom(messages);
+  return true;
+}
+
+function clearStoredChatSession() {
+  try {
+    window.localStorage.removeItem(CONFIG.STORAGE_KEY);
+  } catch (_error) {
+    // Ignored: storage can be unavailable in private browsing or restricted contexts.
+  }
+}
+
+function serializeChatState() {
+  return {
+    intent: chatState.intent,
+    deviceType: chatState.deviceType,
+    brand: chatState.brand,
+    model: chatState.model,
+    issue: chatState.issue,
+    budgetRange: chatState.budgetRange,
+    usage: chatState.usage,
+    preference: chatState.preference,
+    leadName: chatState.leadName,
+    leadCity: chatState.leadCity,
+    leadProductOrIssue: chatState.leadProductOrIssue,
+    leadContact: chatState.leadContact,
+    flow: chatState.flow,
+    step: chatState.step,
+    steps: Array.isArray(chatState.steps) ? chatState.steps : [],
+    currentStepIndex: Utils.clampNumber(chatState.currentStepIndex, 0, 40),
+    answers: { ...chatState.answers },
+    answerHistory: Array.isArray(chatState.answerHistory) ? chatState.answerHistory.slice(-20) : [],
+    invalidRetries: Utils.clampNumber(chatState.invalidRetries, 0, CONFIG.maxReintentos),
+    lastInteractionAt: chatState.lastInteractionAt || Date.now(),
+    memoria: { ...chatState.memoria }
+  };
+}
+
+function applySerializedChatState(state) {
+  Object.assign(chatState, {
+    intent: sanitizeText(state.intent, 60) || null,
+    deviceType: sanitizeText(state.deviceType, 90) || null,
+    brand: sanitizeText(state.brand, 90) || null,
+    model: sanitizeText(state.model, 90) || null,
+    issue: sanitizeText(state.issue, 120) || null,
+    budgetRange: sanitizeText(state.budgetRange, 90) || null,
+    usage: sanitizeText(state.usage, 90) || null,
+    preference: sanitizeText(state.preference, 90) || null,
+    leadName: sanitizeText(state.leadName, 90) || null,
+    leadCity: sanitizeText(state.leadCity, 90) || null,
+    leadProductOrIssue: sanitizeText(state.leadProductOrIssue, 120) || null,
+    leadContact: sanitizeText(state.leadContact, 90) || null,
+    flow: sanitizeText(state.flow, 40) || null,
+    step: sanitizeText(state.step, 60) || null,
+    steps: Array.isArray(state.steps) ? state.steps : [],
+    currentStepIndex: Utils.clampNumber(state.currentStepIndex || 0, 0, 40),
+    answers: sanitizeRecord(state.answers, 120),
+    answerHistory: Array.isArray(state.answerHistory) ? state.answerHistory.slice(-20) : [],
+    invalidRetries: Utils.clampNumber(state.invalidRetries || 0, 0, CONFIG.maxReintentos),
+    lastInteractionAt: state.lastInteractionAt || Date.now(),
+    memoria: {
+      ...createDiagnosticMemory(),
+      ...sanitizeRecord(state.memoria, 180)
+    }
+  });
+}
+
+function sanitizeRecord(record, maxLength) {
+  if (!record || typeof record !== "object" || Array.isArray(record)) return {};
+  return Object.fromEntries(
+    Object.entries(record)
+      .slice(0, 40)
+      .map(([key, value]) => [sanitizeText(key, 60), sanitizeText(value, maxLength)])
+      .filter(([key]) => key)
+  );
+}
+
+function renderChatHistoryEntry(container, entry) {
+  if (!entry || typeof entry !== "object") return;
+  if (entry.kind === "message") {
+    appendMessage(container, entry.text || "", entry.type === "user" ? "user" : "bot");
+    return;
+  }
+  if (entry.kind === "card") {
+    appendBotCard(container, {
+      title: entry.title || "Mensaje",
+      lines: Array.isArray(entry.lines) ? entry.lines : null,
+      rows: Array.isArray(entry.rows) ? entry.rows : null,
+      action: entry.action || null
+    });
+  }
+}
+
 function appendMessage(container, text, type) {
+  if (!container) return;
   const message = document.createElement("div");
-  message.className = `message ${type}`;
-  message.textContent = text;
+  const safeType = type === "user" ? "user" : "bot";
+  const safeText = sanitizeText(text, MAX_CHAT_LENGTH);
+  message.className = `message ${safeType}`;
+  message.textContent = safeText;
   container.appendChild(message);
+  pushChatHistory({ kind: "message", type: safeType, text: safeText });
   scrollChatToBottom(container);
 }
 
 function appendBotCard(container, payload) {
+  if (!container || !payload) return;
+  const safePayload = sanitizeBotPayload(payload);
   const card = document.createElement("div");
   card.className = "message bot bot-card";
 
   const title = document.createElement("strong");
   title.className = "bot-card-title";
-  title.textContent = payload.title;
+  title.textContent = safePayload.title;
   card.appendChild(title);
 
-  if (payload.lines) {
+  if (safePayload.lines) {
     const list = document.createElement("ul");
     list.className = "bot-card-list";
-    payload.lines.forEach((line) => {
+    safePayload.lines.forEach((line) => {
       const item = document.createElement("li");
       item.textContent = line;
       list.appendChild(item);
@@ -1297,10 +1787,10 @@ function appendBotCard(container, payload) {
     card.appendChild(list);
   }
 
-  if (payload.rows) {
+  if (safePayload.rows) {
     const rows = document.createElement("dl");
     rows.className = "bot-card-rows";
-    payload.rows.forEach(([label, value]) => {
+    safePayload.rows.forEach(([label, value]) => {
       const term = document.createElement("dt");
       term.textContent = label;
       const detail = document.createElement("dd");
@@ -1311,10 +1801,25 @@ function appendBotCard(container, payload) {
   }
 
   container.appendChild(card);
-  if (payload.action) {
-    appendWhatsAppButton(container, payload.action.message, payload.action.label);
+  pushChatHistory({ kind: "card", ...safePayload });
+  if (safePayload.action) {
+    appendWhatsAppButton(container, safePayload.action.message, safePayload.action.label);
   }
   scrollChatToBottom(container);
+}
+
+function sanitizeBotPayload(payload) {
+  return {
+    title: sanitizeText(payload.title || "Mensaje", 80),
+    lines: Array.isArray(payload.lines) ? payload.lines.map((line) => sanitizeText(line, 240)) : null,
+    rows: Array.isArray(payload.rows)
+      ? payload.rows.map(([label, value]) => [sanitizeText(label, 80), sanitizeText(value, 260)])
+      : null,
+    action: payload.action ? {
+      label: sanitizeText(payload.action.label || "Hablar por WhatsApp", 80),
+      message: sanitizeText(payload.action.message || "", 1800)
+    } : null
+  };
 }
 
 function appendQuickActions(container, actions) {
@@ -1325,6 +1830,9 @@ function appendQuickActions(container, actions) {
     button.type = "button";
     button.className = "quick-reply";
     button.textContent = action;
+    button.title = action;
+    button.tabIndex = 0;
+    button.setAttribute("aria-label", action);
     button.addEventListener("click", () => {
       handleChatUserText(container, action);
     });
@@ -1341,6 +1849,9 @@ function appendWhatsAppButton(container, message, label = "Hablar por WhatsApp")
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.textContent = label;
+  link.title = label;
+  link.tabIndex = 0;
+  link.setAttribute("aria-label", label);
   container.appendChild(link);
   scrollChatToBottom(container);
 }
@@ -1360,6 +1871,308 @@ function showTyping(container, callback) {
   }, 320);
 }
 
+function createDiagnosticMemory() {
+  return {
+    marca: "",
+    modelo: "",
+    problema: "",
+    evento: "",
+    sintomas: "",
+    tiempo: "",
+    gravedad: "",
+    confianza: 0
+  };
+}
+
+function buildDiagnosticSteps(issue) {
+  const baseSteps = [
+    { field: "deviceType", title: "Tipo de dispositivo", question: "Qué equipo deseas revisar: celular, tablet, computador o smartwatch?", options: ["Celular", "Tablet", "Computador", "Smartwatch", "No sé"] },
+    { field: "brand", title: "Marca", question: "Cuál es la marca del equipo? Si no aparece en tu mente, escribe Otra o No sé.", options: ["Xiaomi", "Samsung", "iPhone", "Motorola", "Huawei", "Otra", "No sé"] },
+    { field: "model", title: "Referencia o modelo", question: "Cuál es la referencia o modelo exacto? Ej: Xiaomi Redmi Note 12, Samsung A14, iPhone 11 o Motorola G60." },
+    { field: "issue", title: "Falla principal", question: "Cuál es la falla principal que presenta el equipo?", options: ["No enciende", "Pantalla rota / dañada", "No carga", "Batería dura poco", "Computador lento", "Software / virus", "No sé"] }
+  ].filter((step) => {
+    if (step.field === "brand") return !chatState.memoria.marca;
+    if (step.field === "model") return !chatState.memoria.modelo;
+    if (step.field === "issue") return !issue;
+    return true;
+  });
+
+  return [
+    ...baseSteps,
+    ...buildIssueSpecificSteps(issue)
+  ];
+}
+
+function buildIssueSpecificSteps(issue) {
+  const category = getDiagnosticCategory(issue);
+  return DIAGNOSTIC_KNOWLEDGE_BASE[category].questions.map((question) => ({ ...question, category }));
+}
+
+function getDiagnosticCategory(text) {
+  const normalized = normalizeChatText(text || "");
+  const matchedKey = Object.keys(DIAGNOSTIC_KNOWLEDGE_BASE).find((key) => {
+    if (key === "general") return false;
+    return DIAGNOSTIC_KNOWLEDGE_BASE[key].aliases.some((alias) => normalized.includes(normalizeChatText(alias)));
+  });
+  return matchedKey || "general";
+}
+
+function askCurrentDiagnosticQuestion(messages) {
+  const currentStep = chatState.steps[chatState.currentStepIndex];
+  if (!currentStep) {
+    finishDiagnosticFlow(messages);
+    return;
+  }
+  chatState.step = currentStep.field;
+  askFlowQuestion(
+    messages,
+    `${currentStep.title} · Pregunta ${chatState.currentStepIndex + 1} de ${chatState.steps.length}`,
+    currentStep.question
+  );
+  appendOptionReplies(messages, getStepOptions(currentStep));
+}
+
+function getStepOptions(step) {
+  return Array.isArray(step?.options) ? step.options : [];
+}
+
+function getStepMaxLength(step) {
+  if (!step) return CONFIG.MAX_CHAT_LENGTH;
+  if (step.field === "model") return CONFIG.MODEL_MAX_LENGTH;
+  if (step.field === "customBrand") return CONFIG.CUSTOM_BRAND_MAX_LENGTH;
+  if (!getStepOptions(step).length) return CONFIG.MAX_CHAT_LENGTH;
+  return 140;
+}
+
+function appendOptionReplies(container, options) {
+  if (!options.length) return;
+  appendQuickActions(container, options);
+}
+
+function validateDiagnosticAnswer(answer, validOptions) {
+  if (!validOptions?.length) {
+    return { isValid: true, canonical: sanitizeText(answer, 90) };
+  }
+
+  const normalized = Utils.normalizarTexto(answer);
+  if (isUnknownAnswer(answer)) {
+    const unknownOption = validOptions.find((option) => isUnknownAnswer(option)) || "No sé";
+    return { isValid: true, canonical: unknownOption };
+  }
+
+  for (const option of validOptions) {
+    const optionNormalized = Utils.normalizarTexto(option);
+    if (normalized === optionNormalized) return { isValid: true, canonical: option };
+    if (normalized.length > 3 && optionNormalized.includes(normalized)) return { isValid: true, canonical: option };
+    if (optionNormalized.length > 3 && normalized.includes(optionNormalized)) return { isValid: true, canonical: option };
+  }
+
+  const match = Utils.mejorCoincidencia(answer, validOptions);
+  return match.esValida
+    ? { isValid: true, canonical: match.opcion }
+    : { isValid: false, canonical: "" };
+}
+
+function handleInvalidDiagnosticAnswer(messages, currentStep) {
+  chatState.invalidRetries += 1;
+  if (chatState.invalidRetries >= CONFIG.maxReintentos) {
+    appendBotCard(messages, {
+      title: "No estás seleccionando una opción válida",
+      lines: ["¿Qué deseas hacer?"]
+    });
+    appendQuickActions(messages, ["Ver opciones", "Hablar con asesor", "Nueva consulta"]);
+    persistChatSession();
+    return;
+  }
+
+  appendBotCard(messages, {
+    title: "No entendí esa respuesta",
+    lines: ["Por favor selecciona una de las siguientes opciones:"]
+  });
+  askCurrentDiagnosticQuestion(messages);
+  persistChatSession();
+}
+
+function handleDiagnosticRetryAction(messages, text) {
+  if (matches(text, ["ver opciones"])) {
+    chatState.invalidRetries = 0;
+    askCurrentDiagnosticQuestion(messages);
+    persistChatSession();
+    return true;
+  }
+
+  if (matches(text, ["hablar con asesor"])) {
+    appendBotCard(messages, {
+      title: "Asesoría técnica",
+      lines: ["Puedes enviar lo que llevamos del diagnóstico a un asesor."],
+      action: {
+        label: "Hablar con asesor",
+        message: buildPartialDiagnosticWhatsAppMessage()
+      }
+    });
+    persistChatSession();
+    return true;
+  }
+
+  if (matches(text, ["nueva consulta"])) {
+    resetChatFlow("diagnóstico", "deviceType");
+    chatState.steps = buildDiagnosticSteps("");
+    chatState.currentStepIndex = 0;
+    appendBotCard(messages, {
+      title: "Nueva consulta",
+      lines: ["Empecemos nuevamente con un diagnóstico limpio."]
+    });
+    askCurrentDiagnosticQuestion(messages);
+    persistChatSession();
+    return true;
+  }
+
+  return false;
+}
+
+function saveDiagnosticAnswer(step, value) {
+  const safeValue = sanitizeText(value, getStepMaxLength(step));
+  const previous = getDiagnosticFieldValue(step.field);
+  chatState.answerHistory.push({ field: step.field, previous, step });
+
+  if (step.field === "deviceType") {
+    chatState.deviceType = safeValue;
+  } else if (step.field === "brand") {
+    chatState.brand = isOtherBrand(safeValue) || isUnknownAnswer(safeValue) ? "" : safeValue;
+  } else if (step.field === "model") {
+    chatState.model = isUnknownAnswer(safeValue) ? "" : safeValue;
+  } else if (step.field === "issue") {
+    chatState.issue = safeValue;
+  } else {
+    chatState.answers[step.field] = safeValue;
+  }
+
+  updateMemoryFromStep(step.field, safeValue);
+}
+
+function getDiagnosticFieldValue(field) {
+  if (field === "deviceType") return chatState.deviceType;
+  if (field === "brand" || field === "customBrand") return chatState.brand;
+  if (field === "model") return chatState.model;
+  if (field === "issue") return chatState.issue;
+  return chatState.answers[field];
+}
+
+function updateMemoryFromStep(field, value) {
+  if (isUnknownAnswer(value)) return;
+  if (field === "brand" || field === "customBrand") updateDiagnosticMemory("marca", value);
+  if (field === "model") updateDiagnosticMemory("modelo", value);
+  if (field === "issue") updateDiagnosticMemory("problema", value);
+  if (["evento", "tipoDano"].includes(field)) updateDiagnosticMemory("evento", value);
+  if (["sintomas", "tactil", "cargador", "puerto", "temperatura", "iconoCarga", "duracion", "reposo", "porcentaje", "bateriaInflada", "sistemaOperativo", "almacenamiento", "ram", "momentoLentitud", "softwareSospechoso", "ruidos"].includes(field)) {
+    const current = chatState.memoria.sintomas ? `${chatState.memoria.sintomas}; ` : "";
+    updateDiagnosticMemory("sintomas", `${current}${value}`);
+  }
+  if (field === "tiempo") updateDiagnosticMemory("tiempo", value);
+}
+
+function updateDiagnosticMemory(field, value) {
+  chatState.memoria[field] = value;
+}
+
+function insertDiagnosticStepAfterCurrent(step) {
+  const exists = chatState.steps.some((item) => item.field === step.field);
+  if (!exists) chatState.steps.splice(chatState.currentStepIndex + 1, 0, step);
+}
+
+function personalizeModelQuestion(brand) {
+  const modelStep = chatState.steps.find((step) => step.field === "model");
+  if (!modelStep) return;
+  modelStep.question = isKnownDiagnosticBrand(brand)
+    ? `Cuál es la referencia o modelo exacto del ${brand}? Ej: ${getModelExample(brand)}.`
+    : `Cuál es la referencia o modelo exacto del equipo ${brand}? Si no la sabes, escribe No sé.`;
+}
+
+function isKnownDiagnosticBrand(value) {
+  const brand = normalizeChatText(value || "");
+  return KNOWN_DIAGNOSTIC_BRANDS.some((knownBrand) => brand.includes(normalizeChatText(knownBrand)));
+}
+
+function getModelExample(brand) {
+  const text = normalizeChatText(brand || "");
+  if (text.includes("xiaomi")) return "Xiaomi Redmi Note 12";
+  if (text.includes("samsung")) return "Samsung A14";
+  if (text.includes("iphone") || text.includes("apple")) return "iPhone 11";
+  if (text.includes("motorola")) return "Motorola G60";
+  if (text.includes("huawei")) return "Huawei Y9";
+  return `${brand} modelo exacto`;
+}
+
+function replacePendingIssueSteps(nextSteps) {
+  const answeredFields = new Set(chatState.answerHistory.map((item) => item.field));
+  const fixedSteps = chatState.steps.slice(0, chatState.currentStepIndex + 1);
+  const pendingSteps = nextSteps.filter((step) => !answeredFields.has(step.field));
+  chatState.steps = [...fixedSteps, ...pendingSteps];
+}
+
+function correctLastDiagnosticAnswer(messages) {
+  const last = chatState.answerHistory.pop();
+  if (!last) {
+    appendBotCard(messages, {
+      title: "Sin respuesta anterior",
+      lines: ["Aún no hay una respuesta para corregir."]
+    });
+    return;
+  }
+  restoreDiagnosticField(last.field, last.previous);
+  chatState.currentStepIndex = Math.max(0, chatState.currentStepIndex - 1);
+  askCurrentDiagnosticQuestion(messages);
+}
+
+function restoreDiagnosticField(field, value) {
+  if (field === "deviceType") chatState.deviceType = value || null;
+  else if (field === "brand" || field === "customBrand") chatState.brand = value || null;
+  else if (field === "model") chatState.model = value || null;
+  else if (field === "issue") chatState.issue = value || null;
+  else if (value) chatState.answers[field] = value;
+  else delete chatState.answers[field];
+
+  chatState.memoria = buildDiagnosticMemoryFromState();
+}
+
+function buildDiagnosticMemoryFromState() {
+  const memory = createDiagnosticMemory();
+  memory.marca = chatState.brand || "";
+  memory.modelo = chatState.model || "";
+  memory.problema = chatState.issue || "";
+  memory.evento = chatState.answers.evento || chatState.answers.tipoDano || "";
+  memory.tiempo = chatState.answers.tiempo || "";
+  memory.sintomas = Object.entries(chatState.answers)
+    .filter(([key]) => !["evento", "tipoDano", "tiempo"].includes(key))
+    .map(([, value]) => value)
+    .filter(Boolean)
+    .join("; ");
+  return memory;
+}
+
+function isCorrectionRequest(text) {
+  return matches(text, ["corregir", "corrige", "editar", "cambiar respuesta", "me equivoque", "me equivoqué"]);
+}
+
+function isOtherBrand(value) {
+  const text = normalizeChatText(value || "");
+  return ["otra", "otro", "otra marca", "no aparece"].some((term) => text === normalizeChatText(term));
+}
+
+function isUnknownAnswer(value) {
+  const text = normalizeChatText(value || "");
+  const compactText = text.replace(/[^a-z0-9\s]/g, "").trim();
+  return ["no se", "no s", "nose", "no sé", "no recuerdo", "ni idea", "desconozco"].some((term) => compactText === normalizeChatText(term).replace(/[^a-z0-9\s]/g, "").trim());
+}
+
+function hasWaterWarning(value) {
+  return matches(normalizeChatText(value || ""), ["agua", "humedad", "liquido", "líquido", "mojado", "se mojo", "se mojó"]);
+}
+
+function hasCriticalBatteryWarning(value) {
+  return matches(normalizeChatText(value || ""), ["bateria inflada", "batería inflada", "inflada", "tapa levantada", "pantalla levantada", "humo"]);
+}
+
 function askFlowQuestion(messages, title, question) {
   appendBotCard(messages, {
     title,
@@ -1369,14 +2182,33 @@ function askFlowQuestion(messages, title, question) {
 
 function resetChatFlow(flow, step) {
   clearChatFlow();
+  if (flow === "diagnóstico") {
+    resetDiagnosticContext();
+  }
   chatState.flow = flow;
   chatState.step = step;
 }
 
-function clearChatFlow() {
+function clearChatFlow(options = {}) {
   chatState.flow = null;
   chatState.step = null;
+  chatState.steps = [];
+  chatState.currentStepIndex = 0;
   chatState.answers = {};
+  chatState.answerHistory = [];
+  chatState.invalidRetries = 0;
+  if (options.persist !== false) persistChatSession();
+}
+
+function resetDiagnosticContext() {
+  chatState.deviceType = null;
+  chatState.brand = null;
+  chatState.model = null;
+  chatState.issue = null;
+  chatState.answers = {};
+  chatState.answerHistory = [];
+  chatState.invalidRetries = 0;
+  chatState.memoria = createDiagnosticMemory();
 }
 
 function normalizeChatText(value) {
@@ -1391,31 +2223,115 @@ function matches(text, terms) {
 }
 
 function detectIssue(text) {
-  const issues = ["pantalla rota", "no carga", "no enciende", "batería", "sobrecalentamiento", "humedad", "cámara", "sonido", "software", "virus", "computador lento"];
-  return issues.find((issue) => text.includes(normalizeChatText(issue))) || null;
+  const category = getDiagnosticCategory(text);
+  return category === "general" ? null : DIAGNOSTIC_KNOWLEDGE_BASE[category].title;
 }
 
 function getPossibleCauses(text) {
   if (matches(text, ["agua", "humedad", "líquido", "mojo"])) return ["humedad interna", "corrosión", "posible daño en placa"];
-  if (matches(text, ["pantalla", "display", "touch", "golpe"])) return ["display afectado", "táctil dañado", "conector interno flojo"];
+  if (matches(text, ["pantalla", "display", "touch", "tactil", "táctil", "golpe", "linea verde", "línea verde", "mancha"])) return ["display afectado", "táctil dañado", "conector interno flojo"];
   if (matches(text, ["no carga", "cargador", "puerto"])) return ["puerto de carga", "cable o cargador", "batería o flex de carga"];
   if (matches(text, ["no enciende", "no prende"])) return ["batería descargada o deteriorada", "software", "posible falla de placa"];
-  if (matches(text, ["batería", "descarga"])) return ["batería degradada", "consumo por apps", "cargador no compatible"];
+  if (matches(text, ["batería", "bateria", "descarga", "porcentaje", "inflada"])) return ["batería degradada", "consumo por apps", "cargador no compatible"];
   if (matches(text, ["cámara"])) return ["lente sucio", "modulo de cámara", "software de cámara"];
   if (matches(text, ["sonido", "audio"])) return ["altavoz", "micrófono", "configuración o humedad"];
   if (matches(text, ["virus", "software", "apps"])) return ["apps sospechosas", "software saturado", "configuración insegura"];
-  if (matches(text, ["lento", "computador"])) return ["almacenamiento lleno", "disco deteriorado", "RAM insuficiente"];
+  if (matches(text, ["lento", "computador", "hdd", "ssd", "ram", "ruidos"])) return ["almacenamiento lleno o disco HDD lento", "disco deteriorado", "RAM insuficiente"];
   return ["requiere revisión técnica", "posible falla de software", "posible componente interno"];
 }
 
 function getUrgency(text) {
-  if (matches(text, ["agua", "humedad", "líquido", "no enciende", "batería inflada", "humo", "calienta mucho"])) return "Alto";
+  if (chatState.memoria.gravedad === "Alta") return "Alta";
+  if (matches(text, ["agua", "humedad", "líquido", "liquido", "no enciende", "batería inflada", "bateria inflada", "humo", "calienta mucho", "tapa levantada", "pantalla levantada"])) return "Alta";
   if (matches(text, ["pantalla", "no carga", "cámara", "sonido", "virus"])) return "Medio";
-  return "Bajo";
+  return "Baja";
 }
 
-function buildDiagnosticWhatsAppMessage(causes, urgency, recommendation) {
-  return `Hola, necesito revisión técnica en DCS Technology. Dispositivo: ${chatState.deviceType || "no indicado"} ${chatState.brand || ""} ${chatState.model || ""}. Falla: ${chatState.issue || "no indicada"}. Posibles causas: ${causes.join(", ")}. Urgencia: ${urgency}. Recomendación: ${recommendation}`;
+function buildDiagnosticRecommendation(issueText, urgency) {
+  if (hasCriticalBatteryWarning(issueText)) {
+    return "No uses ni cargues el equipo. Una batería inflada requiere revisión técnica prioritaria.";
+  }
+  if (hasWaterWarning(issueText)) {
+    return "No lo cargues ni lo enciendas. Conviene revisión técnica cuanto antes para evitar corrosión.";
+  }
+  if (urgency === "Alta") {
+    return "Evita seguir usando el equipo y solicita revisión técnica cuanto antes.";
+  }
+  return "Se recomienda revisión técnica para confirmar causa y cotización.";
+}
+
+function calculateDiagnosticConfidence(causes, urgency) {
+  const answeredValues = [
+    chatState.deviceType,
+    chatState.brand,
+    chatState.model,
+    chatState.issue,
+    ...Object.values(chatState.answers)
+  ];
+  const completeAnswers = answeredValues.filter((value) => value && !isUnknownAnswer(value)).length;
+  const unknownAnswers = answeredValues.filter((value) => value && isUnknownAnswer(value)).length;
+  const expectedAnswers = Math.max(chatState.steps.length, 1);
+  const completionScore = Math.round((completeAnswers / expectedAnswers) * 55);
+  const hasBrand = Boolean(chatState.brand && !isUnknownAnswer(chatState.brand));
+  const hasModel = Boolean(chatState.model && !isUnknownAnswer(chatState.model));
+  const hasIssue = Boolean(chatState.issue && getDiagnosticCategory(chatState.issue) !== "general");
+  const hasCause = causes.some((cause) => !normalizeChatText(cause).includes("requiere revision"));
+  const coherencePenalty = hasCriticalBatteryWarning(Object.values(chatState.answers).join(" ")) && urgency !== "Alta" ? 10 : 0;
+
+  let confidence = 20 + completionScore;
+  if (hasBrand) confidence += 8;
+  if (hasModel) confidence += 12;
+  if (hasIssue) confidence += 10;
+  if (hasCause) confidence += 8;
+  confidence -= unknownAnswers * 7;
+  confidence -= coherencePenalty;
+
+  const maxConfidence = !hasBrand && !hasModel ? 60 : hasBrand && !hasModel ? 75 : 98;
+  return Math.max(1, Math.min(maxConfidence, confidence));
+}
+
+function buildDiagnosticWhatsAppMessage(causes, urgency, recommendation, confidence) {
+  const now = new Date();
+  const formattedDate = now.toLocaleString("es-CO", {
+    dateStyle: "short",
+    timeStyle: "short"
+  });
+  const safeProblem = chatState.memoria.problema || chatState.issue || "No identificado";
+  const safeUrgency = urgency || chatState.memoria.gravedad || "No identificado";
+  const safeConfidence = Number.isFinite(confidence) && confidence > 0
+    ? `${confidence}/100`
+    : chatState.memoria.confianza
+      ? `${chatState.memoria.confianza}/100`
+      : "No identificado";
+  const answerRows = Object.entries(chatState.answers)
+    .map(([field, value]) => `${field}: ${value}`)
+    .join(" | ");
+
+  return [
+    "Hola, necesito revisión técnica en DCS Technology.",
+    `Problema identificado: ${safeProblem}.`,
+    `Marca: ${chatState.memoria.marca || "no indicada"}.`,
+    `Modelo/referencia: ${chatState.memoria.modelo || "no indicado"}.`,
+    `Respuestas completas: ${answerRows || "sin respuestas adicionales"}.`,
+    `Causa probable: ${causes.join(", ")}.`,
+    `Gravedad: ${safeUrgency}.`,
+    `Confianza del diagnóstico: ${safeConfidence}.`,
+    `Recomendación preliminar: ${recommendation}`,
+    `Fecha y hora: ${formattedDate}.`
+  ].join(" ");
+}
+
+function buildPartialDiagnosticWhatsAppMessage() {
+  const answers = Object.entries(chatState.answers)
+    .map(([field, value]) => `${field}: ${value}`)
+    .join(" | ");
+  return [
+    "Hola, necesito asesoría técnica en DCS Technology.",
+    `Problema: ${chatState.memoria.problema || chatState.issue || "No identificado"}.`,
+    `Marca: ${chatState.memoria.marca || chatState.brand || "no indicada"}.`,
+    `Modelo/referencia: ${chatState.memoria.modelo || chatState.model || "no indicado"}.`,
+    `Respuestas actuales: ${answers || "sin respuestas adicionales"}.`
+  ].join(" ");
 }
 
 function buildQuoteRecommendation() {
